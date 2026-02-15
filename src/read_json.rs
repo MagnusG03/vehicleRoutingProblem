@@ -26,11 +26,11 @@ struct JSONInstance {
     benchmark: f64,
     depot: Depot,
     patients: BTreeMap<usize, Patient>,
-    travel_times: Vec<Vec<usize>>,
+    travel_times: Vec<Vec<f64>>,
 }
 
 pub struct TravelTimes {
-    pub times: Vec<usize>,
+    pub times: Vec<f64>,
     pub columns: usize,
 }
 
@@ -44,13 +44,13 @@ pub struct Instance {
     pub travel_times: TravelTimes,
 }
 
-fn flatten_travel_times(travel_times: Vec<Vec<usize>>) -> TravelTimes {
+fn flatten_travel_times(travel_times: Vec<Vec<f64>>) -> TravelTimes {
     let columns = travel_times[0].len();
     let times = travel_times.into_iter().flatten().collect();
     TravelTimes { times, columns }
 }
 
-pub fn get_travel_time(travel_times: &TravelTimes, from: usize, to: usize) -> usize {
+pub fn get_travel_time(travel_times: &TravelTimes, from: usize, to: usize) -> f64 {
     travel_times.times[from * travel_times.columns + to]
 }
 

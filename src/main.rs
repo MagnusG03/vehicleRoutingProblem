@@ -21,7 +21,7 @@ impl Genome {
         // Check if all patients are visited within their time windows, check nurse load, calculate total travel time, and check if all patients have been visited
 
         let n_patients = instance.patients.len();
-        let mut total_travel_time = 0;
+        let mut total_travel_time = 0.0;
         let mut nurse = 0;
         let mut seen = vec![false; n_patients];
 
@@ -41,10 +41,10 @@ impl Genome {
         }
 
         while nurse < instance.nbr_nurses {
-            let mut total_time = 0;
+            let mut total_time = 0.0;
             let mut load = 0;
             let mut current_location = 0;
-            let mut total_nurse_travel_time = 0;
+            let mut total_nurse_travel_time = 0.0;
 
             let mut gene_index: usize = self.lengths[..nurse].iter().sum::<usize>();
             let gene_end_index = gene_index + self.lengths[nurse];
@@ -70,13 +70,13 @@ impl Genome {
                 current_location = patient_node;
 
                 // Wait until the start time if we arrive early.
-                if total_time < patient_info.start_time {
-                    total_time = patient_info.start_time;
+                if total_time < patient_info.start_time as f64 {
+                    total_time = patient_info.start_time as f64;
                 }
 
                 // If we finish care after the patient end time.
-                total_time += patient_info.care_time;
-                if total_time > patient_info.end_time {
+                total_time += patient_info.care_time as f64;
+                if total_time > patient_info.end_time as f64 {
                     self.fitness = 0.0;
                     return;
                 }
@@ -95,7 +95,7 @@ impl Genome {
 
             // If we cant make it back to the depot on time.
             if total_time + get_travel_time(&instance.travel_times, current_location, 0)
-                > instance.depot.return_time
+                > instance.depot.return_time as f64
             {
                 self.fitness = 0.0;
                 return;
