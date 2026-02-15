@@ -15,7 +15,7 @@ pub struct Patient {
     pub demand: usize,
     pub start_time: usize,
     pub end_time: usize,
-    pub care_time: usize
+    pub care_time: usize,
 }
 
 #[derive(Deserialize)]
@@ -26,11 +26,11 @@ struct JSONInstance {
     benchmark: f64,
     depot: Depot,
     patients: BTreeMap<usize, Patient>,
-    travel_times: Vec<Vec<f64>>,
+    travel_times: Vec<Vec<usize>>,
 }
 
 pub struct TravelTimes {
-    pub times: Vec<f64>,
+    pub times: Vec<usize>,
     pub columns: usize,
 }
 
@@ -44,13 +44,13 @@ pub struct Instance {
     pub travel_times: TravelTimes,
 }
 
-fn flatten_travel_times(travel_times: Vec<Vec<f64>>) -> TravelTimes {
+fn flatten_travel_times(travel_times: Vec<Vec<usize>>) -> TravelTimes {
     let columns = travel_times[0].len();
     let times = travel_times.into_iter().flatten().collect();
-    TravelTimes {times, columns}
+    TravelTimes { times, columns }
 }
 
-pub fn get_travel_time(travel_times: &TravelTimes, from: usize, to: usize) -> f64 {
+pub fn get_travel_time(travel_times: &TravelTimes, from: usize, to: usize) -> usize {
     travel_times.times[from * travel_times.columns + to]
 }
 
@@ -64,6 +64,6 @@ pub fn read_json(path: &str) -> Instance {
         benchmark: json_instance.benchmark,
         depot: json_instance.depot,
         patients: json_instance.patients.into_values().collect(),
-        travel_times: flatten_travel_times(json_instance.travel_times)
+        travel_times: flatten_travel_times(json_instance.travel_times),
     }
 }
