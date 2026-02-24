@@ -14,7 +14,6 @@ struct Genome {
     sequence: Vec<usize>,
     lengths: Vec<usize>,
     fitness: f64,
-    shared_fitness: f64,
     travel_time: f64,
     feasible: bool,
 }
@@ -25,7 +24,6 @@ impl Genome {
             sequence,
             lengths,
             fitness: 0.0,
-            shared_fitness: 0.0,
             travel_time: 0.0,
             feasible: true,
         }
@@ -154,41 +152,6 @@ impl Genome {
         self.fitness = 1.0 / (1.0 + total_travel_time + feasibility_gap + penalty);
         self.travel_time = total_travel_time;
     }
-}
-
-fn calculate_shared_fitnesses(population: &mut Vec<Genome>) {
-    const THRESHOLD: f64 = 0.2;
-    const ALPHA: f64 = 1.0;
-
-    for i in 0..population.len() {
-        let mut denominator = 0.0;
-        for l in 0..population.len() {
-            let distance = genome_difference(&population[i], &population[l]);
-            if distance <= THRESHOLD {
-                denominator += 1.0 - (distance / THRESHOLD).powf(ALPHA);
-            }
-        }
-
-        population[i].shared_fitness = population[i].fitness / denominator;
-    }
-}
-
-fn shared_fitness_with_reference(genome: &Genome, reference: &[Genome]) -> f64 {
-    const THRESHOLD: f64 = 0.2;
-    const ALPHA: f64 = 1.0;
-
-    let mut denominator = 1.0; // Include the genome itself.
-    for other in reference {
-        let distance = genome_difference(genome, other);
-        if distance <= THRESHOLD {
-            denominator += 1.0 - (distance / THRESHOLD).powf(ALPHA);
-        }
-    }
-    genome.fitness / denominator
-}
-
-fn calculate_shared_fitness(genome: &mut Genome, population: &[Genome]) {
-    genome.shared_fitness = shared_fitness_with_reference(genome, population);
 }
 
 fn calculate_entropy(population: &[Genome]) -> f64 {
@@ -478,37 +441,6 @@ fn populate(population_size: usize, instance: &read_json::Instance) -> Vec<Genom
     population
 }
 
-fn tournament_selection(
-    population: &[Genome],
-    population_size: usize,
-    use_shared_fitness: bool,
-) -> Vec<Genome> {
-    let mut rng = rng();
-    let mut selected: Vec<Genome> = Vec::with_capacity(population_size);
-    while selected.len() < population_size {
-        let a = rng.random_range(0..population.len());
-        let b = rng.random_range(0..population.len());
-
-        let a_fitness = if use_shared_fitness {
-            population[a].shared_fitness
-        } else {
-            population[a].fitness
-        };
-        let b_fitness = if use_shared_fitness {
-            population[b].shared_fitness
-        } else {
-            population[b].fitness
-        };
-
-        if a_fitness > b_fitness {
-            selected.push(population[a].clone());
-        } else {
-            selected.push(population[b].clone());
-        }
-    }
-    selected
-}
-
 fn order_crossover(parent1: &Genome, parent2: &Genome, instance: &read_json::Instance) -> Genome {
     let mut rng = rng();
     let n = parent1.sequence.len();
@@ -659,12 +591,6 @@ fn get_non_empty_routes(lengths: &[usize]) -> Vec<usize> {
         .enumerate()
         .filter_map(|(idx, &len)| if len > 0 { Some(idx) } else { None })
         .collect()
-}
-
-fn get_ranked_population_indices(population: &[Genome]) -> Vec<usize> {
-    let mut ranked: Vec<usize> = (0..population.len()).collect();
-    ranked.sort_by(|&a, &b| solution_cmp(&population[a], &population[b]));
-    ranked
 }
 
 fn get_feasible_genomes(population: &[Genome]) -> Vec<Genome> {
@@ -1065,102 +991,6 @@ fn solve_until_target(
         best_entropy_history,
         best_feasible_history,
     )
-}
-
-fn repopulate(
-    population: &mut Vec<Genome>,
-    instance: &read_json::Instance,
-    mutation_rate: f64,
-    population_size: usize,
-) {
-    let mut rng = rng();
-    let mut new_population = Vec::with_capacity(population_size);
-
-    while new_population.len() < population_size {
-        let parent1 = population[rng.random_range(0..population.len())].clone();
-        let parent2 = population[rng.random_range(0..population.len())].clone();
-
-        let mut child = order_crossover(&parent1, &parent2, instance);
-        random_mutate(&mut child, 1, mutation_rate);
-        child.calculate_fitness(instance);
-        new_population.push(child);
-    }
-    *population = new_population;
-}
-
-fn deterministic_crowding_repopulation(
-    population: &mut Vec<Genome>,
-    instance: &read_json::Instance,
-    mutation_rate: f64,
-    population_size: usize,
-) {
-    let mut rng = rng();
-    let mut new_population = Vec::with_capacity(population_size);
-    calculate_shared_fitnesses(population);
-
-    while new_population.len() < population_size {
-        let parent1 = population[rng.random_range(0..population.len())].clone();
-        let parent2 = population[rng.random_range(0..population.len())].clone();
-
-        let mut child = order_crossover(&parent1, &parent2, instance);
-        random_mutate(&mut child, 1, mutation_rate);
-        child.calculate_fitness(instance);
-        calculate_shared_fitness(&mut child, population);
-
-        if genome_difference(&child, &parent1) < genome_difference(&child, &parent2) {
-            if child.shared_fitness > parent1.shared_fitness {
-                new_population.push(child);
-            } else {
-                new_population.push(parent1);
-            }
-        } else {
-            if child.shared_fitness > parent2.shared_fitness {
-                new_population.push(child);
-            } else {
-                new_population.push(parent2);
-            }
-        }
-    }
-    *population = new_population;
-}
-
-fn elitism_deterministic_crowding_repopulation(
-    population: &mut Vec<Genome>,
-    instance: &read_json::Instance,
-    mutation_rate: f64,
-    elite_size: usize,
-    population_size: usize,
-) {
-    let mut rng = rng();
-    let mut new_population = Vec::with_capacity(population_size);
-    calculate_shared_fitnesses(population);
-
-    new_population.extend(get_elites(population, elite_size));
-
-    while new_population.len() < population_size {
-        let parent1 = population[rng.random_range(0..population.len())].clone();
-        let parent2 = population[rng.random_range(0..population.len())].clone();
-
-        let mut child = order_crossover(&parent1, &parent2, instance);
-        random_mutate(&mut child, 1, mutation_rate);
-        child.calculate_fitness(instance);
-        calculate_shared_fitness(&mut child, population);
-
-        if genome_difference(&child, &parent1) < genome_difference(&child, &parent2) {
-            if child.shared_fitness > parent1.shared_fitness {
-                new_population.push(child);
-            } else {
-                new_population.push(parent1);
-            }
-        } else {
-            if child.shared_fitness > parent2.shared_fitness {
-                new_population.push(child);
-            } else {
-                new_population.push(parent2);
-            }
-        }
-    }
-    *population = new_population;
 }
 
 fn elitism_scaling_probabilistic_crowding_repopulation(
