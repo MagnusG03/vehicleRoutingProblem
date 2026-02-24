@@ -352,56 +352,29 @@ fn plot_metrics(
     Ok(())
 }
 
-fn greedy_seed_candidate(instance: &read_json::Instance) -> Genome {
+fn create_seeded_genome(instance: &read_json::Instance) -> Genome {
+    const LATENESS_PENALTY: f64 = 1000.0;
+    const OVERLOAD_PENALTY: f64 = 3000.0;
+    const RETURN_LATE_PENALTY: f64 = 800.0;
+    const ROUTE_BALANCE_WEIGHT: f64 = 2.0;
+    const SCORE_NOISE: f64 = 1e-4;
+
     let n_patients = instance.patients.len();
     let n_nurses = instance.nbr_nurses;
     let mut rng = rng();
 
-    let urgency_weight = rng.random_range(0.8..1.6);
-    let width_weight = rng.random_range(0.3..1.2);
-    let start_weight = rng.random_range(0.1..0.7);
-    let demand_weight = rng.random_range(0.0..0.5);
-
-    let lateness_weight = rng.random_range(9000.0..15000.0);
-    let overload_weight = rng.random_range(9000.0..15000.0);
-    let return_weight = rng.random_range(4000.0..9000.0);
-    let travel_weight = rng.random_range(0.8..2.0);
-    let balance_weight = rng.random_range(0.0..3.0);
-    let score_noise = rng.random_range(0.2..2.0);
-
-    let tie_noise: Vec<f64> = (0..n_patients)
-        .map(|_| rng.random_range(0.0..40.0))
-        .collect();
-
-    let mut order: Vec<usize> = (0..n_patients).collect();
-    order.sort_by(|&a, &b| {
+    let mut patient_order: Vec<usize> = (0..n_patients).collect();
+    patient_order.sort_by(|&a, &b| {
         let pa = &instance.patients[a];
         let pb = &instance.patients[b];
-
-        let width_a = pa.end_time.saturating_sub(pa.start_time) as f64;
-        let width_b = pb.end_time.saturating_sub(pb.start_time) as f64;
-
-        let key_a = urgency_weight * pa.end_time as f64
-            + width_weight * width_a
-            + start_weight * pa.start_time as f64
-            + demand_weight * pa.demand as f64
-            + tie_noise[a];
-        let key_b = urgency_weight * pb.end_time as f64
-            + width_weight * width_b
-            + start_weight * pb.start_time as f64
-            + demand_weight * pb.demand as f64
-            + tie_noise[b];
-        key_a.total_cmp(&key_b)
+        pa.end_time
+            .cmp(&pb.end_time)
+            .then(pa.start_time.cmp(&pb.start_time))
+            .then(pb.demand.cmp(&pa.demand))
     });
 
     if n_patients > 1 {
-        let max_band_size = n_patients.min(12);
-        let band_size = if max_band_size > 2 {
-            rng.random_range(2..(max_band_size + 1))
-        } else {
-            max_band_size
-        };
-        for chunk in order.chunks_mut(band_size.max(1)) {
+        for chunk in patient_order.chunks_mut(4) {
             chunk.shuffle(&mut rng);
         }
     }
@@ -409,66 +382,64 @@ fn greedy_seed_candidate(instance: &read_json::Instance) -> Genome {
     let mut routes: Vec<Vec<usize>> = vec![Vec::new(); n_nurses];
     let mut route_time = vec![0.0f64; n_nurses];
     let mut route_load = vec![0usize; n_nurses];
-    let mut route_loc = vec![0usize; n_nurses];
-    let mut assigned = 0usize;
+    let mut route_location = vec![0usize; n_nurses];
 
-    for patient in order {
-        let p = &instance.patients[patient];
+    for patient in patient_order {
+        let patient_info = &instance.patients[patient];
         let patient_node = patient + 1;
-        let average_route_size = (assigned as f64 + 1.0) / n_nurses as f64;
-        let mut choices: Vec<(f64, usize, f64, usize, usize)> = Vec::with_capacity(n_nurses);
+        let average_route_size =
+            (routes.iter().map(|r| r.len()).sum::<usize>() as f64 + 1.0) / n_nurses as f64;
+
+        let mut best_nurse = 0usize;
+        let mut best_score = f64::INFINITY;
+        let mut best_time = 0.0f64;
+        let mut best_load = 0usize;
 
         for nurse in 0..n_nurses {
-            let travel = get_travel_time(&instance.travel_times, route_loc[nurse], patient_node);
-            let mut t = route_time[nurse] + travel;
-            if t < p.start_time as f64 {
-                t = p.start_time as f64;
-            }
-            t += p.care_time as f64;
+            let travel =
+                get_travel_time(&instance.travel_times, route_location[nurse], patient_node);
 
-            let lateness = (t - p.end_time as f64).max(0.0);
-            let overload = (route_load[nurse] + p.demand).saturating_sub(instance.capacity_nurse);
-            let return_lateness = (t + get_travel_time(&instance.travel_times, patient_node, 0)
+            let mut projected_time = route_time[nurse] + travel;
+            if projected_time < patient_info.start_time as f64 {
+                projected_time = patient_info.start_time as f64;
+            }
+            projected_time += patient_info.care_time as f64;
+
+            let projected_load = route_load[nurse] + patient_info.demand;
+            let lateness = (projected_time - patient_info.end_time as f64).max(0.0);
+            let overload = projected_load.saturating_sub(instance.capacity_nurse);
+            let return_lateness = (projected_time
+                + get_travel_time(&instance.travel_times, patient_node, 0)
                 - instance.depot.return_time as f64)
                 .max(0.0);
-            let projected_route_size = routes[nurse].len() as f64 + 1.0;
-            let imbalance = (projected_route_size - average_route_size).abs();
+            let route_size_after_insert = routes[nurse].len() as f64 + 1.0;
+            let balance_penalty = (route_size_after_insert - average_route_size).abs();
 
-            let violation_cost = lateness_weight * lateness
-                + overload_weight * overload as f64
-                + return_weight * return_lateness;
-            let score = violation_cost
-                + travel_weight * travel
-                + balance_weight * imbalance
-                + rng.random_range(0.0..score_noise);
+            let score = travel
+                + LATENESS_PENALTY * lateness
+                + OVERLOAD_PENALTY * overload as f64
+                + RETURN_LATE_PENALTY * return_lateness
+                + ROUTE_BALANCE_WEIGHT * balance_penalty
+                + rng.random_range(0.0..SCORE_NOISE);
 
-            choices.push((score, nurse, t, route_load[nurse] + p.demand, patient_node));
+            if score < best_score {
+                best_score = score;
+                best_nurse = nurse;
+                best_time = projected_time;
+                best_load = projected_load;
+            }
         }
 
-        choices.sort_by(|a, b| a.0.total_cmp(&b.0));
-        let max_rcl_size = choices.len().min(4);
-        let rcl_size = if max_rcl_size > 1 {
-            rng.random_range(1..(max_rcl_size + 1))
-        } else {
-            1
-        };
-        let (_, selected_nurse, selected_time, selected_load, selected_loc) =
-            choices[rng.random_range(0..rcl_size)];
-
-        routes[selected_nurse].push(patient);
-        route_time[selected_nurse] = selected_time;
-        route_load[selected_nurse] = selected_load;
-        route_loc[selected_nurse] = selected_loc;
-        assigned += 1;
+        routes[best_nurse].push(patient);
+        route_time[best_nurse] = best_time;
+        route_load[best_nurse] = best_load;
+        route_location[best_nurse] = patient_node;
     }
-
-    let mut nurse_order: Vec<usize> = (0..n_nurses).collect();
-    nurse_order.shuffle(&mut rng);
 
     let mut sequence = Vec::with_capacity(n_patients);
     let mut lengths = vec![0usize; n_nurses];
-    for (slot, nurse) in nurse_order.into_iter().enumerate() {
-        lengths[slot] = routes[nurse].len();
+    for nurse in 0..n_nurses {
+        lengths[nurse] = routes[nurse].len();
         sequence.extend(routes[nurse].iter().copied());
     }
 
@@ -477,139 +448,31 @@ fn greedy_seed_candidate(instance: &read_json::Instance) -> Genome {
     genome
 }
 
-fn greedy_seed_genome(instance: &read_json::Instance) -> Genome {
-    const CONSTRUCTION_ATTEMPTS: usize = 6;
-    const LOCAL_SEARCH_REFINEMENTS: usize = 1;
-    const LOCAL_SEARCH_MIN_STEPS: usize = 8;
-    const LOCAL_SEARCH_MAX_STEPS: usize = 24;
-    const ELITE_POOL_SIZE: usize = 5;
-
-    let mut rng = rng();
-    let mut candidates = Vec::with_capacity(CONSTRUCTION_ATTEMPTS);
-
-    for _ in 0..CONSTRUCTION_ATTEMPTS {
-        candidates.push(greedy_seed_candidate(instance));
-    }
-
-    candidates.sort_by(solution_cmp);
-
-    for idx in 0..LOCAL_SEARCH_REFINEMENTS.min(candidates.len()) {
-        let steps = rng.random_range(LOCAL_SEARCH_MIN_STEPS..(LOCAL_SEARCH_MAX_STEPS + 1));
-        let improved = local_search(candidates[idx].clone(), instance, steps, None);
-        candidates[idx] = improved;
-    }
-
-    candidates.sort_by(solution_cmp);
-
-    let elite_pool_size = ELITE_POOL_SIZE.min(candidates.len()).max(1);
-    let mut total_weight = 0.0;
-    for rank in 0..elite_pool_size {
-        total_weight += 1.0 / (rank as f64 + 1.0);
-    }
-
-    let mut draw = rng.random_range(0.0..total_weight);
-    let mut chosen_rank = elite_pool_size - 1;
-    for rank in 0..elite_pool_size {
-        draw -= 1.0 / (rank as f64 + 1.0);
-        if draw <= 0.0 {
-            chosen_rank = rank;
-            break;
-        }
-    }
-
-    candidates.swap_remove(chosen_rank)
-}
-
-fn random_genome(instance: &read_json::Instance) -> Genome {
-    let mut rng = rng();
-    let n_patients = instance.patients.len();
-    let n_nurses = instance.nbr_nurses;
-
-    let mut sequence: Vec<usize> = (0..n_patients).collect();
-    sequence.shuffle(&mut rng);
-
-    let mut lengths = vec![0usize; n_nurses];
-    for _ in 0..n_patients {
-        let k = rng.random_range(0..n_nurses);
-        lengths[k] += 1;
-    }
-
-    let mut genome = Genome::new(sequence, lengths);
-    genome.calculate_fitness(instance);
-    genome
-}
-
-fn immigrate(population: &mut Vec<Genome>, instance: &read_json::Instance) {
-    const SEED_RATE: f64 = 0.7;
-    const IMMIGRATION_SIZE: usize = 100;
-    let mut rng = rng();
-
-    for _ in 0..IMMIGRATION_SIZE {
-        if rng.random_bool(SEED_RATE) {
-            population.push(greedy_seed_genome(instance));
-        } else {
-            population.push(random_genome(instance));
-        }
-    }
-}
-
 fn populate(population_size: usize, instance: &read_json::Instance) -> Vec<Genome> {
+    const SEEDED_RATE: f64 = 0.85;
+
     let n_patients = instance.patients.len();
     let n_nurses = instance.nbr_nurses;
-
     let mut rng = rng();
     let mut population = Vec::with_capacity(population_size);
-    let max_attempts_per_genome = 200;
 
     for _ in 0..population_size {
-        let mut best_any: Option<Genome> = None;
-        let mut best_feasible: Option<Genome> = None;
+        if rng.random_bool(SEEDED_RATE) {
+            population.push(create_seeded_genome(instance));
+        } else {
+            let mut sequence: Vec<usize> = (0..n_patients).collect();
+            sequence.shuffle(&mut rng);
 
-        // Seed from a constructive heuristic so population starts near feasible space.
-        let seeded = greedy_seed_genome(instance);
-        if best_any.as_ref().is_none_or(|b| seeded.fitness > b.fitness) {
-            best_any = Some(seeded.clone());
-        }
-        if seeded.feasible {
-            best_feasible = Some(seeded);
-        }
-
-        // Avoid costly random retries when the seeded solution is already feasible.
-        if best_feasible.is_none() {
-            for _ in 0..max_attempts_per_genome {
-                let mut sequence: Vec<usize> = (0..n_patients).collect();
-                sequence.shuffle(&mut rng);
-
-                let mut lengths = vec![0usize; n_nurses];
-                for _ in 0..n_patients {
-                    let k = rng.random_range(0..n_nurses);
-                    lengths[k] += 1;
-                }
-
-                let mut genome = Genome::new(sequence, lengths);
-                genome.calculate_fitness(instance);
-
-                if best_any.as_ref().is_none_or(|b| genome.fitness > b.fitness) {
-                    best_any = Some(genome.clone());
-                }
-
-                if genome.feasible {
-                    if best_feasible
-                        .as_ref()
-                        .is_none_or(|b| genome.travel_time < b.travel_time)
-                    {
-                        best_feasible = Some(genome);
-                    }
-                    break; // stop attempts once we found a feasible one
-                }
+            let mut lengths = vec![0usize; n_nurses];
+            for _ in 0..n_patients {
+                let k = rng.random_range(0..n_nurses);
+                lengths[k] += 1;
             }
-        }
 
-        population.push(
-            best_feasible
-                .or(best_any)
-                .expect("Failed to generate genome"),
-        );
+            let mut genome = Genome::new(sequence, lengths);
+            genome.calculate_fitness(instance);
+            population.push(genome);
+        }
     }
 
     population
@@ -778,85 +641,6 @@ fn edge_crossover(parent1: &Genome, parent2: &Genome, instance: &read_json::Inst
     child
 }
 
-fn swap_mutate(genome: &mut Genome, path_mutation_rate: f64, length_mutation_rate: f64) {
-    let mut rng = rng();
-    // Swap two patients in the sequence.
-    if rng.random_bool(path_mutation_rate) {
-        let i = rng.random_range(0..genome.sequence.len());
-        let j = rng.random_range(0..genome.sequence.len());
-        genome.sequence.swap(i, j);
-    }
-
-    // Transfer one patient from one nurse to another to preserve total.
-    if rng.random_bool(length_mutation_rate) {
-        let from = rng.random_range(0..genome.lengths.len());
-        let mut to = rng.random_range(0..genome.lengths.len());
-        while to == from {
-            to = rng.random_range(0..genome.lengths.len());
-        }
-
-        if genome.lengths[from] > 0 {
-            genome.lengths[from] -= 1;
-            genome.lengths[to] += 1;
-        }
-    }
-}
-
-fn inversion_mutate(genome: &mut Genome, path_mutation_rate: f64, length_mutation_rate: f64) {
-    // Invert a subsequence of patients in the sequence.
-    let mut rng = rng();
-    let start = rng.random_range(0..genome.sequence.len());
-    let end = rng.random_range(start..genome.sequence.len());
-    if rng.random_bool(path_mutation_rate) {
-        genome.sequence[start..=end].reverse();
-    }
-
-    // Transfer one patient from one nurse to another to preserve total.
-    if rng.random_bool(length_mutation_rate) {
-        let from = rng.random_range(0..genome.lengths.len());
-        let mut to = rng.random_range(0..genome.lengths.len());
-        while to == from {
-            to = rng.random_range(0..genome.lengths.len());
-        }
-
-        if genome.lengths[from] > 0 {
-            genome.lengths[from] -= 1;
-            genome.lengths[to] += 1;
-        }
-    }
-}
-
-fn local_search_better(
-    candidate: &Genome,
-    incumbent: &Genome,
-    shared_reference: Option<&[Genome]>,
-) -> bool {
-    let (candidate_shared, incumbent_shared) = if let Some(reference) = shared_reference {
-        (
-            shared_fitness_with_reference(candidate, reference),
-            shared_fitness_with_reference(incumbent, reference),
-        )
-    } else {
-        // Local-search contexts without a population reference fall back to raw fitness.
-        (candidate.fitness, incumbent.fitness)
-    };
-
-    match (candidate.feasible, incumbent.feasible) {
-        (true, false) => true,
-        (false, true) => false,
-        (true, true) => {
-            if candidate.travel_time < incumbent.travel_time {
-                true
-            } else if (candidate.travel_time - incumbent.travel_time).abs() < 1e-9 {
-                candidate_shared > incumbent_shared
-            } else {
-                false
-            }
-        }
-        (false, false) => candidate_shared > incumbent_shared,
-    }
-}
-
 fn solution_cmp(a: &Genome, b: &Genome) -> std::cmp::Ordering {
     match (a.feasible, b.feasible) {
         (true, false) => std::cmp::Ordering::Less,
@@ -869,43 +653,49 @@ fn solution_cmp(a: &Genome, b: &Genome) -> std::cmp::Ordering {
     }
 }
 
-fn route_offsets(lengths: &[usize], sequence_len: usize) -> Option<Vec<usize>> {
-    let mut offsets = Vec::with_capacity(lengths.len() + 1);
-    offsets.push(0);
-    let mut acc = 0usize;
-
-    for &len in lengths {
-        acc += len;
-        offsets.push(acc);
-    }
-
-    if acc == sequence_len {
-        Some(offsets)
-    } else {
-        None
-    }
+fn get_non_empty_routes(lengths: &[usize]) -> Vec<usize> {
+    lengths
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, &len)| if len > 0 { Some(idx) } else { None })
+        .collect()
 }
 
-fn first_improving_two_opt(
-    base: &Genome,
-    instance: &read_json::Instance,
-    shared_reference: Option<&[Genome]>,
-) -> Option<Genome> {
-    let offsets = route_offsets(&base.lengths, base.sequence.len())?;
+fn get_ranked_population_indices(population: &[Genome]) -> Vec<usize> {
+    let mut ranked: Vec<usize> = (0..population.len()).collect();
+    ranked.sort_by(|&a, &b| solution_cmp(&population[a], &population[b]));
+    ranked
+}
 
-    for nurse in 0..base.lengths.len() {
-        let start = offsets[nurse];
-        let end = offsets[nurse + 1];
+fn get_feasible_genomes(population: &[Genome]) -> Vec<Genome> {
+    population.iter().filter(|g| g.feasible).cloned().collect()
+}
+
+fn best_feasible_solution(population: &[Genome]) -> Option<&Genome> {
+    population
+        .iter()
+        .filter(|g| g.feasible)
+        .min_by(|a, b| a.travel_time.total_cmp(&b.travel_time))
+}
+
+fn is_better_solution(candidate: &Genome, current: &Genome) -> bool {
+    solution_cmp(candidate, current) == std::cmp::Ordering::Less
+}
+
+fn local_search_reverse_route(genome: &Genome, instance: &read_json::Instance) -> Option<Genome> {
+    for nurse in 0..genome.lengths.len() {
+        let start = genome.lengths[..nurse].iter().sum::<usize>();
+        let end = start + genome.lengths[nurse];
         if end - start < 2 {
             continue;
         }
 
         for i in start..(end - 1) {
             for j in (i + 1)..end {
-                let mut candidate = base.clone();
+                let mut candidate = genome.clone();
                 candidate.sequence[i..=j].reverse();
                 candidate.calculate_fitness(instance);
-                if local_search_better(&candidate, base, shared_reference) {
+                if is_better_solution(&candidate, genome) {
                     return Some(candidate);
                 }
             }
@@ -914,17 +704,15 @@ fn first_improving_two_opt(
     None
 }
 
-fn first_improving_relocate(
-    base: &Genome,
+fn local_search_relocate_patient(
+    genome: &Genome,
     instance: &read_json::Instance,
-    shared_reference: Option<&[Genome]>,
 ) -> Option<Genome> {
-    let offsets = route_offsets(&base.lengths, base.sequence.len())?;
-    let n_routes = base.lengths.len();
+    let n_routes = genome.lengths.len();
 
     for from_route in 0..n_routes {
-        let from_start = offsets[from_route];
-        let from_end = offsets[from_route + 1];
+        let from_start = genome.lengths[..from_route].iter().sum::<usize>();
+        let from_end = from_start + genome.lengths[from_route];
         if from_end == from_start {
             continue;
         }
@@ -935,11 +723,11 @@ fn first_improving_relocate(
                     continue;
                 }
 
-                let to_start = offsets[to_route];
-                let to_end = offsets[to_route + 1];
+                let to_start = genome.lengths[..to_route].iter().sum::<usize>();
+                let to_end = to_start + genome.lengths[to_route];
 
                 for insert_pos in to_start..=to_end {
-                    let mut candidate = base.clone();
+                    let mut candidate = genome.clone();
                     let moved = candidate.sequence.remove(from_idx);
                     let adjusted_insert = if insert_pos > from_idx {
                         insert_pos - 1
@@ -952,7 +740,7 @@ fn first_improving_relocate(
                     candidate.lengths[to_route] += 1;
                     candidate.calculate_fitness(instance);
 
-                    if local_search_better(&candidate, base, shared_reference) {
+                    if is_better_solution(&candidate, genome) {
                         return Some(candidate);
                     }
                 }
@@ -962,35 +750,30 @@ fn first_improving_relocate(
     None
 }
 
-fn first_improving_inter_route_swap(
-    base: &Genome,
-    instance: &read_json::Instance,
-    shared_reference: Option<&[Genome]>,
-) -> Option<Genome> {
-    let offsets = route_offsets(&base.lengths, base.sequence.len())?;
-    let n_routes = base.lengths.len();
+fn local_search_swap_patient(genome: &Genome, instance: &read_json::Instance) -> Option<Genome> {
+    let n_routes = genome.lengths.len();
 
     for route_a in 0..n_routes {
-        let a_start = offsets[route_a];
-        let a_end = offsets[route_a + 1];
+        let a_start = genome.lengths[..route_a].iter().sum::<usize>();
+        let a_end = a_start + genome.lengths[route_a];
         if a_end == a_start {
             continue;
         }
 
         for route_b in (route_a + 1)..n_routes {
-            let b_start = offsets[route_b];
-            let b_end = offsets[route_b + 1];
+            let b_start = genome.lengths[..route_b].iter().sum::<usize>();
+            let b_end = b_start + genome.lengths[route_b];
             if b_end == b_start {
                 continue;
             }
 
             for idx_a in a_start..a_end {
                 for idx_b in b_start..b_end {
-                    let mut candidate = base.clone();
+                    let mut candidate = genome.clone();
                     candidate.sequence.swap(idx_a, idx_b);
                     candidate.calculate_fitness(instance);
 
-                    if local_search_better(&candidate, base, shared_reference) {
+                    if is_better_solution(&candidate, genome) {
                         return Some(candidate);
                     }
                 }
@@ -1001,26 +784,22 @@ fn first_improving_inter_route_swap(
     None
 }
 
-fn local_search(
-    mut genome: Genome,
-    instance: &read_json::Instance,
-    max_steps: usize,
-    shared_reference: Option<&[Genome]>,
-) -> Genome {
+fn local_search(mut genome: Genome, instance: &read_json::Instance, max_steps: usize) -> Genome {
+    // First-improving descent: keep applying one improving move until no move improves.
     genome.calculate_fitness(instance);
 
     for _ in 0..max_steps {
-        if let Some(next) = first_improving_two_opt(&genome, instance, shared_reference) {
+        if let Some(next) = local_search_reverse_route(&genome, instance) {
             genome = next;
             continue;
         }
 
-        if let Some(next) = first_improving_relocate(&genome, instance, shared_reference) {
+        if let Some(next) = local_search_relocate_patient(&genome, instance) {
             genome = next;
             continue;
         }
 
-        if let Some(next) = first_improving_inter_route_swap(&genome, instance, shared_reference) {
+        if let Some(next) = local_search_swap_patient(&genome, instance) {
             genome = next;
             continue;
         }
@@ -1031,96 +810,95 @@ fn local_search(
     genome
 }
 
-fn random_perturbation(genome: &mut Genome, moves: usize) {
+fn swap_mutation(genome: &mut Genome, rng: &mut rand::rngs::ThreadRng) {
+    let i = rng.random_range(0..genome.sequence.len());
+    let j = rng.random_range(0..genome.sequence.len());
+    genome.sequence.swap(i, j);
+}
+
+fn inversion_mutation(genome: &mut Genome, rng: &mut rand::rngs::ThreadRng) {
+    if genome.sequence.len() > 1 {
+        let start = rng.random_range(0..genome.sequence.len());
+        let end = rng.random_range(start..genome.sequence.len());
+        genome.sequence[start..=end].reverse();
+    }
+}
+
+fn relocation_mutation(genome: &mut Genome, rng: &mut rand::rngs::ThreadRng) {
+    let route_count = genome.lengths.len();
+    if route_count < 2 {
+        return;
+    }
+
+    let non_empty_routes = get_non_empty_routes(&genome.lengths);
+    if non_empty_routes.is_empty() {
+        return;
+    }
+
+    let from_route = non_empty_routes[rng.random_range(0..non_empty_routes.len())];
+    let mut to_route = rng.random_range(0..route_count);
+    while to_route == from_route {
+        to_route = rng.random_range(0..route_count);
+    }
+
+    let from_start = genome.lengths[..from_route].iter().sum::<usize>();
+    let from_end = from_start + genome.lengths[from_route];
+    if from_end == from_start {
+        return;
+    }
+    let from_idx = rng.random_range(from_start..from_end);
+
+    let to_start = genome.lengths[..to_route].iter().sum::<usize>();
+    let to_end = to_start + genome.lengths[to_route];
+    let insert_pos = rng.random_range(to_start..=to_end);
+
+    let moved = genome.sequence.remove(from_idx);
+    let adjusted_insert = if insert_pos > from_idx {
+        insert_pos - 1
+    } else {
+        insert_pos
+    };
+    genome.sequence.insert(adjusted_insert, moved);
+
+    genome.lengths[from_route] -= 1;
+    genome.lengths[to_route] += 1;
+}
+
+fn route_length_mutation(genome: &mut Genome, rng: &mut rand::rngs::ThreadRng) {
+    let route_count = genome.lengths.len();
+    if route_count < 2 {
+        return;
+    }
+
+    let non_empty_routes = get_non_empty_routes(&genome.lengths);
+    if non_empty_routes.is_empty() {
+        return;
+    }
+
+    let from_route = non_empty_routes[rng.random_range(0..non_empty_routes.len())];
+    let mut to_route = rng.random_range(0..route_count);
+    while to_route == from_route {
+        to_route = rng.random_range(0..route_count);
+    }
+
+    genome.lengths[from_route] -= 1;
+    genome.lengths[to_route] += 1;
+}
+
+fn random_mutate(genome: &mut Genome, moves: usize, mutation_chance: f64) {
     if genome.sequence.is_empty() || genome.lengths.is_empty() {
         return;
     }
 
     let mut rng = rng();
-    let route_count = genome.lengths.len();
 
-    for _ in 0..moves {
-        match rng.random_range(0..4) {
-            // Swap two patients.
-            0 => {
-                let i = rng.random_range(0..genome.sequence.len());
-                let j = rng.random_range(0..genome.sequence.len());
-                genome.sequence.swap(i, j);
-            }
-            // Reverse a random segment.
-            1 => {
-                if genome.sequence.len() > 1 {
-                    let start = rng.random_range(0..genome.sequence.len());
-                    let end = rng.random_range(start..genome.sequence.len());
-                    genome.sequence[start..=end].reverse();
-                }
-            }
-            // Relocate one patient from one route to another.
-            2 => {
-                if route_count < 2 {
-                    continue;
-                }
-                let non_empty_routes: Vec<usize> = genome
-                    .lengths
-                    .iter()
-                    .enumerate()
-                    .filter_map(|(idx, &len)| if len > 0 { Some(idx) } else { None })
-                    .collect();
-                if non_empty_routes.is_empty() {
-                    continue;
-                }
-
-                if let Some(offsets) = route_offsets(&genome.lengths, genome.sequence.len()) {
-                    let from_route = non_empty_routes[rng.random_range(0..non_empty_routes.len())];
-                    let mut to_route = rng.random_range(0..route_count);
-                    while to_route == from_route {
-                        to_route = rng.random_range(0..route_count);
-                    }
-
-                    let from_start = offsets[from_route];
-                    let from_end = offsets[from_route + 1];
-                    if from_end == from_start {
-                        continue;
-                    }
-                    let from_idx = rng.random_range(from_start..from_end);
-
-                    let to_start = offsets[to_route];
-                    let to_end = offsets[to_route + 1];
-                    let insert_pos = rng.random_range(to_start..=to_end);
-
-                    let moved = genome.sequence.remove(from_idx);
-                    let adjusted_insert = if insert_pos > from_idx {
-                        insert_pos - 1
-                    } else {
-                        insert_pos
-                    };
-                    genome.sequence.insert(adjusted_insert, moved);
-
-                    genome.lengths[from_route] -= 1;
-                    genome.lengths[to_route] += 1;
-                }
-            }
-            // Shift one route boundary by moving one patient count between routes.
-            _ => {
-                if route_count < 2 {
-                    continue;
-                }
-                let non_empty_routes: Vec<usize> = genome
-                    .lengths
-                    .iter()
-                    .enumerate()
-                    .filter_map(|(idx, &len)| if len > 0 { Some(idx) } else { None })
-                    .collect();
-                if non_empty_routes.is_empty() {
-                    continue;
-                }
-                let from_route = non_empty_routes[rng.random_range(0..non_empty_routes.len())];
-                let mut to_route = rng.random_range(0..route_count);
-                while to_route == from_route {
-                    to_route = rng.random_range(0..route_count);
-                }
-                genome.lengths[from_route] -= 1;
-                genome.lengths[to_route] += 1;
+    if rng.random_bool(mutation_chance) {
+        for _ in 0..moves {
+            match rng.random_range(0..4) {
+                0 => swap_mutation(genome, &mut rng),
+                1 => inversion_mutation(genome, &mut rng),
+                2 => relocation_mutation(genome, &mut rng),
+                _ => route_length_mutation(genome, &mut rng),
             }
         }
     }
@@ -1133,22 +911,24 @@ fn iterated_local_search(
     local_search_steps: usize,
     max_shake_moves: usize,
 ) -> Genome {
+    // Local search + mutate + local search, repeated until no improvement.
     let mut rng = rng();
-    let mut current = local_search(seed, instance, local_search_steps, None);
+    let mut current = local_search(seed, instance, local_search_steps);
     let mut best = current.clone();
-    let mut stagnation = 0usize;
+    let mut iterations_since_improvement = 0usize;
+    let mut iteration = 0;
 
-    for iter in 0..iterations {
+    while iterations_since_improvement < iterations {
         let mut candidate = current.clone();
-        let shake_moves = (2 + stagnation / 40).min(max_shake_moves.max(2));
-        random_perturbation(&mut candidate, shake_moves);
+        let shake_moves = (2 + iterations_since_improvement / 40).min(max_shake_moves.max(2));
+        random_mutate(&mut candidate, shake_moves, 1.0);
         candidate.calculate_fitness(instance);
-        candidate = local_search(candidate, instance, local_search_steps, None);
+        candidate = local_search(candidate, instance, local_search_steps);
 
-        if solution_cmp(&candidate, &best) == std::cmp::Ordering::Less {
+        if is_better_solution(&candidate, &best) {
             best = candidate.clone();
             current = candidate;
-            stagnation = 0;
+            iterations_since_improvement = 0;
             continue;
         }
 
@@ -1159,7 +939,7 @@ fn iterated_local_search(
                 if candidate.travel_time <= current.travel_time {
                     true
                 } else {
-                    let progress = iter as f64 / iterations.max(1) as f64;
+                    let progress = iteration as f64 / iterations.max(1) as f64;
                     let temperature = (20.0 * (1.0 - progress)).max(0.5);
                     let delta = candidate.travel_time - current.travel_time;
                     let acceptance_probability = (-delta / temperature).exp().clamp(0.0, 1.0);
@@ -1172,21 +952,20 @@ fn iterated_local_search(
         if accept {
             current = candidate;
         }
-        stagnation += 1;
+        iterations_since_improvement += 1;
+        iteration += 1;
 
-        if (iter + 1) % 100 == 0 {
+        if (iteration + 1) % 50 == 0 {
             if best.feasible {
                 println!(
-                    "    ILS progress: {}/{} iterations, best travel time {:.4}",
-                    iter + 1,
-                    iterations,
+                    "    Iteration {}, best travel time {:.4}",
+                    iteration + 1,
                     best.travel_time
                 );
             } else {
                 println!(
-                    "    ILS progress: {}/{} iterations, current best infeasible",
-                    iter + 1,
-                    iterations
+                    "    Iteration {}, current best infeasible",
+                    iteration + 1,
                 );
             }
         }
@@ -1199,11 +978,11 @@ fn solve_until_target(
     instance: &read_json::Instance,
 ) -> (Genome, Vec<f64>, Vec<f64>, Vec<Option<f64>>) {
     const TARGET_GAP_PERCENT: f64 = 5.0;
-    const MAX_RUNS: usize = 12;
+    const MAX_RUNS: usize = 10;
     const POPULATION_SIZE: usize = 120;
     const GENERATIONS: usize = 3000;
     const REFINEMENT_CANDIDATES: usize = 6;
-    const ILS_ITERATIONS: usize = 350;
+    const ILS_ITERATIONS: usize = 300;
     const ILS_LOCAL_SEARCH_STEPS: usize = 90;
     const ILS_MAX_SHAKE_MOVES: usize = 16;
 
@@ -1219,11 +998,7 @@ fn solve_until_target(
         let (run_best, fitness_history, entropy_history, feasible_history, population) =
             genetic_algorithm(instance, POPULATION_SIZE, GENERATIONS);
 
-        let mut refinement_pool: Vec<Genome> = population
-            .iter()
-            .filter(|g| g.feasible)
-            .cloned()
-            .collect();
+        let mut refinement_pool = get_feasible_genomes(&population);
         refinement_pool.sort_by(solution_cmp);
         refinement_pool.truncate(REFINEMENT_CANDIDATES);
         refinement_pool.push(run_best.clone());
@@ -1252,7 +1027,8 @@ fn solve_until_target(
         }
 
         if refined_best.feasible {
-            let gap_pct = 100.0 * (refined_best.travel_time - instance.benchmark) / instance.benchmark;
+            let gap_pct =
+                100.0 * (refined_best.travel_time - instance.benchmark) / instance.benchmark;
             println!(
                 "Restart {} best travel time = {:.4} (gap {:.2}%)",
                 run_idx, refined_best.travel_time, gap_pct
@@ -1264,9 +1040,9 @@ fn solve_until_target(
             );
         }
 
-        let is_better = best_overall
-            .as_ref()
-            .is_none_or(|current_best| solution_cmp(&refined_best, current_best) == std::cmp::Ordering::Less);
+        let is_better = best_overall.as_ref().is_none_or(|current_best| {
+            solution_cmp(&refined_best, current_best) == std::cmp::Ordering::Less
+        });
         if is_better {
             best_overall = Some(refined_best.clone());
             best_fitness_history = fitness_history;
@@ -1294,8 +1070,7 @@ fn solve_until_target(
 fn repopulate(
     population: &mut Vec<Genome>,
     instance: &read_json::Instance,
-    path_mutation_rate: f64,
-    length_mutation_rate: f64,
+    mutation_rate: f64,
     population_size: usize,
 ) {
     let mut rng = rng();
@@ -1306,7 +1081,7 @@ fn repopulate(
         let parent2 = population[rng.random_range(0..population.len())].clone();
 
         let mut child = order_crossover(&parent1, &parent2, instance);
-        swap_mutate(&mut child, path_mutation_rate, length_mutation_rate);
+        random_mutate(&mut child, 1, mutation_rate);
         child.calculate_fitness(instance);
         new_population.push(child);
     }
@@ -1316,8 +1091,7 @@ fn repopulate(
 fn deterministic_crowding_repopulation(
     population: &mut Vec<Genome>,
     instance: &read_json::Instance,
-    path_mutation_rate: f64,
-    length_mutation_rate: f64,
+    mutation_rate: f64,
     population_size: usize,
 ) {
     let mut rng = rng();
@@ -1329,7 +1103,7 @@ fn deterministic_crowding_repopulation(
         let parent2 = population[rng.random_range(0..population.len())].clone();
 
         let mut child = order_crossover(&parent1, &parent2, instance);
-        swap_mutate(&mut child, path_mutation_rate, length_mutation_rate);
+        random_mutate(&mut child, 1, mutation_rate);
         child.calculate_fitness(instance);
         calculate_shared_fitness(&mut child, population);
 
@@ -1353,8 +1127,7 @@ fn deterministic_crowding_repopulation(
 fn elitism_deterministic_crowding_repopulation(
     population: &mut Vec<Genome>,
     instance: &read_json::Instance,
-    path_mutation_rate: f64,
-    length_mutation_rate: f64,
+    mutation_rate: f64,
     elite_size: usize,
     population_size: usize,
 ) {
@@ -1369,7 +1142,7 @@ fn elitism_deterministic_crowding_repopulation(
         let parent2 = population[rng.random_range(0..population.len())].clone();
 
         let mut child = order_crossover(&parent1, &parent2, instance);
-        swap_mutate(&mut child, path_mutation_rate, length_mutation_rate);
+        random_mutate(&mut child, 1, mutation_rate);
         child.calculate_fitness(instance);
         calculate_shared_fitness(&mut child, population);
 
@@ -1393,8 +1166,7 @@ fn elitism_deterministic_crowding_repopulation(
 fn elitism_scaling_probabilistic_crowding_repopulation(
     population: &mut Vec<Genome>,
     instance: &read_json::Instance,
-    path_mutation_rate: f64,
-    length_mutation_rate: f64,
+    mutation_rate: f64,
     elite_size: usize,
     scaling_factor: f64,
     population_size: usize,
@@ -1409,18 +1181,19 @@ fn elitism_scaling_probabilistic_crowding_repopulation(
         let parent2 = population[rng.random_range(0..population.len())].clone();
 
         let mut child1 = edge_crossover(&parent1, &parent2, instance);
-        inversion_mutate(&mut child1, path_mutation_rate, length_mutation_rate);
+        random_mutate(&mut child1, 1, mutation_rate);
         child1.calculate_fitness(instance);
 
         let mut child2 = edge_crossover(&parent2, &parent1, instance);
-        inversion_mutate(&mut child2, path_mutation_rate, length_mutation_rate);
+        random_mutate(&mut child2, 1, mutation_rate);
         child2.calculate_fitness(instance);
 
         if genome_difference(&child1, &parent1) + genome_difference(&child2, &parent2)
             < genome_difference(&child1, &parent2) + genome_difference(&child2, &parent1)
         {
             if child1.fitness > parent1.fitness {
-                let child_prob = child1.fitness / (child1.fitness + parent1.fitness * scaling_factor);
+                let child_prob =
+                    child1.fitness / (child1.fitness + parent1.fitness * scaling_factor);
                 if rng.random_bool(child_prob) {
                     new_population.push(child1);
                 } else {
@@ -1436,7 +1209,8 @@ fn elitism_scaling_probabilistic_crowding_repopulation(
                 }
             }
             if child2.fitness > parent2.fitness {
-                let child_prob = child2.fitness / (child2.fitness + parent2.fitness * scaling_factor);
+                let child_prob =
+                    child2.fitness / (child2.fitness + parent2.fitness * scaling_factor);
                 if rng.random_bool(child_prob) {
                     new_population.push(child2);
                 } else {
@@ -1453,7 +1227,8 @@ fn elitism_scaling_probabilistic_crowding_repopulation(
             }
         } else {
             if child1.fitness > parent2.fitness {
-                let child_prob = child1.fitness / (child1.fitness + parent2.fitness * scaling_factor);
+                let child_prob =
+                    child1.fitness / (child1.fitness + parent2.fitness * scaling_factor);
                 if rng.random_bool(child_prob) {
                     new_population.push(child1);
                 } else {
@@ -1469,7 +1244,8 @@ fn elitism_scaling_probabilistic_crowding_repopulation(
                 }
             }
             if child2.fitness > parent1.fitness {
-                let child_prob = child2.fitness / (child2.fitness + parent1.fitness * scaling_factor);
+                let child_prob =
+                    child2.fitness / (child2.fitness + parent1.fitness * scaling_factor);
                 if rng.random_bool(child_prob) {
                     new_population.push(child2);
                 } else {
@@ -1489,16 +1265,10 @@ fn elitism_scaling_probabilistic_crowding_repopulation(
     *population = new_population;
 }
 
-fn best_fitness(population: &[Genome], use_shared_fitness: bool) -> f64 {
+fn best_fitness(population: &[Genome]) -> f64 {
     population
         .iter()
-        .map(|g| {
-            if use_shared_fitness {
-                g.shared_fitness
-            } else {
-                g.fitness
-            }
-        })
+        .map(|g| g.fitness)
         .fold(f64::NEG_INFINITY, f64::max)
 }
 
@@ -1561,31 +1331,15 @@ fn genetic_algorithm(
     population_size: usize,
     generations: usize,
 ) -> (Genome, Vec<f64>, Vec<f64>, Vec<Option<f64>>, Vec<Genome>) {
-    const USE_SHARED_FITNESS_SELECTION: bool = false;
-    const LIGHT_LS_INTERVAL: usize = 150;
-    const HEAVY_LS_INTERVAL: usize = 600;
-    const LIGHT_LS_TOP_K: usize = 4;
-    const HEAVY_LS_TOP_K: usize = 8;
-    const LIGHT_LS_STEPS: usize = 8;
-    const HEAVY_LS_STEPS: usize = 30;
-
     let mut population = populate(population_size, instance);
     let mut fitness_history = Vec::with_capacity(generations + 1);
     let mut entropy_history = Vec::with_capacity(generations + 1);
     let mut feasible_travel_time_history = Vec::with_capacity(generations + 1);
     let mut running_lowest_feasible_travel_time: Option<f64> = None;
 
-    if USE_SHARED_FITNESS_SELECTION {
-        calculate_shared_fitnesses(&mut population);
-    }
+    let mut global_best_feasible = best_feasible_solution(&population).cloned();
 
-    let mut global_best_feasible = population
-        .iter()
-        .filter(|g| g.feasible)
-        .min_by(|a, b| a.travel_time.total_cmp(&b.travel_time))
-        .cloned();
-
-    fitness_history.push(best_fitness(&population, USE_SHARED_FITNESS_SELECTION));
+    fitness_history.push(best_fitness(&population));
     entropy_history.push(calculate_entropy(&population));
     if let Some(lowest_feasible) = lowest_feasible_travel_time(&population) {
         running_lowest_feasible_travel_time = Some(lowest_feasible);
@@ -1597,69 +1351,32 @@ fn genetic_algorithm(
     let mut scaling_factor;
 
     // Adaptive mutation factors
-    let initial_path_mutation_rate = 0.95;
-    let initial_length_mutation_rate = 0.95;
-    let mut path_mutation_rate;
-    let mut length_mutation_rate;
+    let initial_mutation_rate = 0.95;
+    let mut mutation_rate;
 
     let initial_entropy = calculate_entropy(&population);
     let mut current_entropy;
 
-    for i in 0..generations {
-        let mut ran_local_search = false;
+    let mut generation = 0;
+    let mut generations_since_improvement = 0;
 
-        // Add light local search here
-        if i % LIGHT_LS_INTERVAL == 0 && i % HEAVY_LS_INTERVAL != 0 && i != 0 {
-            let mut ranked: Vec<usize> = (0..population.len()).collect();
-            ranked.sort_by(|&a, &b| solution_cmp(&population[a], &population[b]));
-
-            for idx in ranked.into_iter().take(LIGHT_LS_TOP_K) {
-                let improved = local_search(population[idx].clone(), instance, LIGHT_LS_STEPS, None);
-                population[idx] = improved;
-            }
-            ran_local_search = true;
-        }
-
-        // Add heavy local search here
-        if i % HEAVY_LS_INTERVAL == 0 && i != 0 {
-            let mut ranked: Vec<usize> = (0..population.len()).collect();
-            ranked.sort_by(|&a, &b| solution_cmp(&population[a], &population[b]));
-
-            for idx in ranked.into_iter().take(HEAVY_LS_TOP_K) {
-                let improved = local_search(population[idx].clone(), instance, HEAVY_LS_STEPS, None);
-                population[idx] = improved;
-            }
-            ran_local_search = true;
-        }
-
+    while generations_since_improvement < 2000 {
         current_entropy = calculate_entropy(&population);
 
         scaling_factor = initial_scaling_factor * current_entropy / initial_entropy.max(1e-12);
-        path_mutation_rate =
-            initial_path_mutation_rate * (1.0 - current_entropy / initial_entropy.max(1e-12));
-        length_mutation_rate =
-            initial_length_mutation_rate * (1.0 - current_entropy / initial_entropy.max(1e-12));
-
-        if ran_local_search && USE_SHARED_FITNESS_SELECTION {
-            calculate_shared_fitnesses(&mut population);
-        }
-
-        population = tournament_selection(&population, population_size, USE_SHARED_FITNESS_SELECTION);
+        mutation_rate =
+            initial_mutation_rate * (1.0 - current_entropy / initial_entropy.max(1e-12));
 
         elitism_scaling_probabilistic_crowding_repopulation(
             &mut population,
             instance,
-            path_mutation_rate,
-            length_mutation_rate,
+            mutation_rate,
             4,
             scaling_factor,
             population_size,
         );
-        if USE_SHARED_FITNESS_SELECTION {
-            calculate_shared_fitnesses(&mut population);
-        }
 
-        fitness_history.push(best_fitness(&population, USE_SHARED_FITNESS_SELECTION));
+        fitness_history.push(best_fitness(&population));
         entropy_history.push(calculate_entropy(&population));
         if let Some(lowest_feasible) = lowest_feasible_travel_time(&population) {
             running_lowest_feasible_travel_time = Some(
@@ -1669,29 +1386,25 @@ fn genetic_algorithm(
             );
         }
         feasible_travel_time_history.push(running_lowest_feasible_travel_time);
-        if (i + 1) % 500 == 0 || i == 0 {
+        if (generation + 1) % 500 == 0 || generation == 0 {
             match feasible_travel_time_history.last().unwrap() {
                 Some(v) => println!(
                     "Generation {}: Best Fitness = {}, Entropy = {}, Lowest Feasible Travel Time = {}",
-                    i + 1,
+                    generation + 1,
                     fitness_history.last().unwrap(),
                     entropy_history.last().unwrap(),
                     v
                 ),
                 None => println!(
                     "Generation {}: Best Fitness = {}, Entropy = {}, Lowest Feasible Travel Time = None",
-                    i + 1,
+                    generation + 1,
                     fitness_history.last().unwrap(),
                     entropy_history.last().unwrap()
                 ),
             }
         }
 
-        if let Some(current_best_feasible) = population
-            .iter()
-            .filter(|g| g.feasible)
-            .min_by(|a, b| a.travel_time.total_cmp(&b.travel_time))
-        {
+        if let Some(current_best_feasible) = best_feasible_solution(&population) {
             if global_best_feasible
                 .as_ref()
                 .is_none_or(|best| current_best_feasible.travel_time < best.travel_time)
@@ -1699,6 +1412,7 @@ fn genetic_algorithm(
                 global_best_feasible = Some(current_best_feasible.clone());
             }
         }
+        generation += 1;
     }
 
     let best = if let Some(best_feasible) = global_best_feasible {
@@ -1721,21 +1435,14 @@ fn genetic_algorithm(
 }
 
 fn main() {
-    let instance = read_json("src/train/train_0.json");
+    let instance = read_json("src/train/train_9.json");
     let (best, fitness_history, entropy_history, feasible_travel_time_history) =
         solve_until_target(&instance);
 
+    println!("\n=== Final Solution ===");
     println!("Best fitness: {}", best.fitness);
     println!("Total travel time: {}", best.travel_time);
     println!("Benchmark: {}", instance.benchmark);
-    if best.feasible {
-        let gap_pct = 100.0 * (best.travel_time - instance.benchmark) / instance.benchmark;
-        println!("Gap to benchmark: {}%", gap_pct);
-        println!("Target met (<= 5%): {}", gap_pct <= 5.0);
-    } else {
-        println!("Best solution is infeasible");
-        println!("Target met (<= 5%): false");
-    }
 
     plot_metrics(
         &fitness_history,
