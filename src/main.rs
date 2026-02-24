@@ -1031,6 +1031,266 @@ fn local_search(
     genome
 }
 
+fn random_perturbation(genome: &mut Genome, moves: usize) {
+    if genome.sequence.is_empty() || genome.lengths.is_empty() {
+        return;
+    }
+
+    let mut rng = rng();
+    let route_count = genome.lengths.len();
+
+    for _ in 0..moves {
+        match rng.random_range(0..4) {
+            // Swap two patients.
+            0 => {
+                let i = rng.random_range(0..genome.sequence.len());
+                let j = rng.random_range(0..genome.sequence.len());
+                genome.sequence.swap(i, j);
+            }
+            // Reverse a random segment.
+            1 => {
+                if genome.sequence.len() > 1 {
+                    let start = rng.random_range(0..genome.sequence.len());
+                    let end = rng.random_range(start..genome.sequence.len());
+                    genome.sequence[start..=end].reverse();
+                }
+            }
+            // Relocate one patient from one route to another.
+            2 => {
+                if route_count < 2 {
+                    continue;
+                }
+                let non_empty_routes: Vec<usize> = genome
+                    .lengths
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(idx, &len)| if len > 0 { Some(idx) } else { None })
+                    .collect();
+                if non_empty_routes.is_empty() {
+                    continue;
+                }
+
+                if let Some(offsets) = route_offsets(&genome.lengths, genome.sequence.len()) {
+                    let from_route = non_empty_routes[rng.random_range(0..non_empty_routes.len())];
+                    let mut to_route = rng.random_range(0..route_count);
+                    while to_route == from_route {
+                        to_route = rng.random_range(0..route_count);
+                    }
+
+                    let from_start = offsets[from_route];
+                    let from_end = offsets[from_route + 1];
+                    if from_end == from_start {
+                        continue;
+                    }
+                    let from_idx = rng.random_range(from_start..from_end);
+
+                    let to_start = offsets[to_route];
+                    let to_end = offsets[to_route + 1];
+                    let insert_pos = rng.random_range(to_start..=to_end);
+
+                    let moved = genome.sequence.remove(from_idx);
+                    let adjusted_insert = if insert_pos > from_idx {
+                        insert_pos - 1
+                    } else {
+                        insert_pos
+                    };
+                    genome.sequence.insert(adjusted_insert, moved);
+
+                    genome.lengths[from_route] -= 1;
+                    genome.lengths[to_route] += 1;
+                }
+            }
+            // Shift one route boundary by moving one patient count between routes.
+            _ => {
+                if route_count < 2 {
+                    continue;
+                }
+                let non_empty_routes: Vec<usize> = genome
+                    .lengths
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(idx, &len)| if len > 0 { Some(idx) } else { None })
+                    .collect();
+                if non_empty_routes.is_empty() {
+                    continue;
+                }
+                let from_route = non_empty_routes[rng.random_range(0..non_empty_routes.len())];
+                let mut to_route = rng.random_range(0..route_count);
+                while to_route == from_route {
+                    to_route = rng.random_range(0..route_count);
+                }
+                genome.lengths[from_route] -= 1;
+                genome.lengths[to_route] += 1;
+            }
+        }
+    }
+}
+
+fn iterated_local_search(
+    seed: Genome,
+    instance: &read_json::Instance,
+    iterations: usize,
+    local_search_steps: usize,
+    max_shake_moves: usize,
+) -> Genome {
+    let mut rng = rng();
+    let mut current = local_search(seed, instance, local_search_steps, None);
+    let mut best = current.clone();
+    let mut stagnation = 0usize;
+
+    for iter in 0..iterations {
+        let mut candidate = current.clone();
+        let shake_moves = (2 + stagnation / 40).min(max_shake_moves.max(2));
+        random_perturbation(&mut candidate, shake_moves);
+        candidate.calculate_fitness(instance);
+        candidate = local_search(candidate, instance, local_search_steps, None);
+
+        if solution_cmp(&candidate, &best) == std::cmp::Ordering::Less {
+            best = candidate.clone();
+            current = candidate;
+            stagnation = 0;
+            continue;
+        }
+
+        let accept = match (candidate.feasible, current.feasible) {
+            (true, false) => true,
+            (false, true) => false,
+            (true, true) => {
+                if candidate.travel_time <= current.travel_time {
+                    true
+                } else {
+                    let progress = iter as f64 / iterations.max(1) as f64;
+                    let temperature = (20.0 * (1.0 - progress)).max(0.5);
+                    let delta = candidate.travel_time - current.travel_time;
+                    let acceptance_probability = (-delta / temperature).exp().clamp(0.0, 1.0);
+                    rng.random_bool(acceptance_probability)
+                }
+            }
+            (false, false) => candidate.fitness > current.fitness || rng.random_bool(0.05),
+        };
+
+        if accept {
+            current = candidate;
+        }
+        stagnation += 1;
+
+        if (iter + 1) % 100 == 0 {
+            if best.feasible {
+                println!(
+                    "    ILS progress: {}/{} iterations, best travel time {:.4}",
+                    iter + 1,
+                    iterations,
+                    best.travel_time
+                );
+            } else {
+                println!(
+                    "    ILS progress: {}/{} iterations, current best infeasible",
+                    iter + 1,
+                    iterations
+                );
+            }
+        }
+    }
+
+    best
+}
+
+fn solve_until_target(
+    instance: &read_json::Instance,
+) -> (Genome, Vec<f64>, Vec<f64>, Vec<Option<f64>>) {
+    const TARGET_GAP_PERCENT: f64 = 5.0;
+    const MAX_RUNS: usize = 12;
+    const POPULATION_SIZE: usize = 120;
+    const GENERATIONS: usize = 3000;
+    const REFINEMENT_CANDIDATES: usize = 6;
+    const ILS_ITERATIONS: usize = 350;
+    const ILS_LOCAL_SEARCH_STEPS: usize = 90;
+    const ILS_MAX_SHAKE_MOVES: usize = 16;
+
+    let target_travel_time = instance.benchmark * (1.0 + TARGET_GAP_PERCENT / 100.0);
+
+    let mut best_overall: Option<Genome> = None;
+    let mut best_fitness_history = Vec::new();
+    let mut best_entropy_history = Vec::new();
+    let mut best_feasible_history = Vec::new();
+
+    for run_idx in 1..=MAX_RUNS {
+        println!("\n=== Restart {}/{} ===", run_idx, MAX_RUNS);
+        let (run_best, fitness_history, entropy_history, feasible_history, population) =
+            genetic_algorithm(instance, POPULATION_SIZE, GENERATIONS);
+
+        let mut refinement_pool: Vec<Genome> = population
+            .iter()
+            .filter(|g| g.feasible)
+            .cloned()
+            .collect();
+        refinement_pool.sort_by(solution_cmp);
+        refinement_pool.truncate(REFINEMENT_CANDIDATES);
+        refinement_pool.push(run_best.clone());
+
+        let mut refined_best = run_best;
+        let refinement_total = refinement_pool.len();
+        for (candidate_idx, candidate) in refinement_pool.into_iter().enumerate() {
+            println!(
+                "  Refining candidate {}/{}...",
+                candidate_idx + 1,
+                refinement_total
+            );
+            let refined = iterated_local_search(
+                candidate,
+                instance,
+                ILS_ITERATIONS,
+                ILS_LOCAL_SEARCH_STEPS,
+                ILS_MAX_SHAKE_MOVES,
+            );
+            if solution_cmp(&refined, &refined_best) == std::cmp::Ordering::Less {
+                refined_best = refined;
+            }
+            if refined_best.feasible && refined_best.travel_time <= target_travel_time {
+                break;
+            }
+        }
+
+        if refined_best.feasible {
+            let gap_pct = 100.0 * (refined_best.travel_time - instance.benchmark) / instance.benchmark;
+            println!(
+                "Restart {} best travel time = {:.4} (gap {:.2}%)",
+                run_idx, refined_best.travel_time, gap_pct
+            );
+        } else {
+            println!(
+                "Restart {} best solution is infeasible (fitness = {:.8})",
+                run_idx, refined_best.fitness
+            );
+        }
+
+        let is_better = best_overall
+            .as_ref()
+            .is_none_or(|current_best| solution_cmp(&refined_best, current_best) == std::cmp::Ordering::Less);
+        if is_better {
+            best_overall = Some(refined_best.clone());
+            best_fitness_history = fitness_history;
+            best_entropy_history = entropy_history;
+            best_feasible_history = feasible_history;
+        }
+
+        if refined_best.feasible && refined_best.travel_time <= target_travel_time {
+            println!(
+                "Target reached on restart {} (<= {:.4})",
+                run_idx, target_travel_time
+            );
+            break;
+        }
+    }
+
+    (
+        best_overall.expect("No solution produced across restarts"),
+        best_fitness_history,
+        best_entropy_history,
+        best_feasible_history,
+    )
+}
+
 fn repopulate(
     population: &mut Vec<Genome>,
     instance: &read_json::Instance,
@@ -1302,12 +1562,12 @@ fn genetic_algorithm(
     generations: usize,
 ) -> (Genome, Vec<f64>, Vec<f64>, Vec<Option<f64>>, Vec<Genome>) {
     const USE_SHARED_FITNESS_SELECTION: bool = false;
-    const LIGHT_LS_INTERVAL: usize = 200;
-    const HEAVY_LS_INTERVAL: usize = 1000;
-    const LIGHT_LS_TOP_K: usize = 3;
-    const HEAVY_LS_TOP_K: usize = 6;
-    const LIGHT_LS_STEPS: usize = 6;
-    const HEAVY_LS_STEPS: usize = 20;
+    const LIGHT_LS_INTERVAL: usize = 150;
+    const HEAVY_LS_INTERVAL: usize = 600;
+    const LIGHT_LS_TOP_K: usize = 4;
+    const HEAVY_LS_TOP_K: usize = 8;
+    const LIGHT_LS_STEPS: usize = 8;
+    const HEAVY_LS_STEPS: usize = 30;
 
     let mut population = populate(population_size, instance);
     let mut fitness_history = Vec::with_capacity(generations + 1);
@@ -1462,21 +1722,26 @@ fn genetic_algorithm(
 
 fn main() {
     let instance = read_json("src/train/train_0.json");
-    let (best, fitness_history, entropy_history, feasible_travel_time_history, _population) =
-        genetic_algorithm(&instance, 100, 2000);
-
-    // Add heavy local search on best individual
-    let best = local_search(best, &instance, 120, None);
+    let (best, fitness_history, entropy_history, feasible_travel_time_history) =
+        solve_until_target(&instance);
 
     println!("Best fitness: {}", best.fitness);
     println!("Total travel time: {}", best.travel_time);
     println!("Benchmark: {}", instance.benchmark);
+    if best.feasible {
+        let gap_pct = 100.0 * (best.travel_time - instance.benchmark) / instance.benchmark;
+        println!("Gap to benchmark: {}%", gap_pct);
+        println!("Target met (<= 5%): {}", gap_pct <= 5.0);
+    } else {
+        println!("Best solution is infeasible");
+        println!("Target met (<= 5%): false");
+    }
 
     plot_metrics(
         &fitness_history,
         &entropy_history,
         &feasible_travel_time_history,
-        "40000_100_elitism_scaling_probabilistic_crowding_repopulation_0.01_mutation13.png",
+        "multi_start_ils_metrics.png",
     )
     .expect("Failed to plot metrics");
 }
