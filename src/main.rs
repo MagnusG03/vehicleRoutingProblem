@@ -7,8 +7,6 @@ use rand::seq::SliceRandom;
 use read_json::{get_travel_time, read_json};
 use std::error::Error;
 
-//TODO: Create islands that rejoin after like 2000 generations into one island and also stop populate function from being deterministic.
-//TODO: Also test simpler GA types but still with local search.
 #[derive(Clone)]
 struct Genome {
     sequence: Vec<usize>,
@@ -441,41 +439,6 @@ fn populate(population_size: usize, instance: &read_json::Instance) -> Vec<Genom
     population
 }
 
-fn order_crossover(parent1: &Genome, parent2: &Genome, instance: &read_json::Instance) -> Genome {
-    let mut rng = rng();
-    let n = parent1.sequence.len();
-
-    let mut sequence = vec![usize::MAX; n];
-    if n > 0 {
-        let start = rng.random_range(0..n);
-        let end = rng.random_range(start..n);
-
-        for i in start..=end {
-            sequence[i] = parent1.sequence[i];
-        }
-
-        let mut insert_idx = (end + 1) % n;
-        for offset in 0..n {
-            let candidate = parent2.sequence[(end + 1 + offset) % n];
-            if !sequence.contains(&candidate) {
-                sequence[insert_idx] = candidate;
-                insert_idx = (insert_idx + 1) % n;
-            }
-        }
-    }
-
-    // Keep one full parent length vector to ensure validity.
-    let lengths = if rng.random_bool(0.5) {
-        parent1.lengths.clone()
-    } else {
-        parent2.lengths.clone()
-    };
-
-    let mut child: Genome = Genome::new(sequence, lengths);
-    child.calculate_fitness(instance);
-    child
-}
-
 fn edge_crossover(parent1: &Genome, parent2: &Genome, instance: &read_json::Instance) -> Genome {
     let mut rng = rng();
     let n = parent1.sequence.len();
@@ -889,10 +852,7 @@ fn iterated_local_search(
                     best.travel_time
                 );
             } else {
-                println!(
-                    "    Iteration {}, current best infeasible",
-                    iteration + 1,
-                );
+                println!("    Iteration {}, current best infeasible", iteration + 1,);
             }
         }
     }
@@ -1190,7 +1150,7 @@ fn genetic_algorithm(
     let mut generation = 0;
     let mut generations_since_improvement = 0;
 
-    while generations_since_improvement < 2000 {
+    while generations_since_improvement < 1000 {
         current_entropy = calculate_entropy(&population);
 
         scaling_factor = initial_scaling_factor * current_entropy / initial_entropy.max(1e-12);
@@ -1240,9 +1200,11 @@ fn genetic_algorithm(
                 .is_none_or(|best| current_best_feasible.travel_time < best.travel_time)
             {
                 global_best_feasible = Some(current_best_feasible.clone());
+                generations_since_improvement = 0;
             }
         }
         generation += 1;
+        generations_since_improvement += 1;
     }
 
     let best = if let Some(best_feasible) = global_best_feasible {
