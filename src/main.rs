@@ -886,7 +886,7 @@ fn solve_until_target(
 
         let mut refinement_pool = get_feasible_genomes(&population);
         refinement_pool.sort_by(solution_cmp);
-        refinement_pool.truncate(REFINEMENT_CANDIDATES);
+        refinement_pool.truncate(REFINEMENT_CANDIDATES - 1);
         refinement_pool.push(run_best.clone());
 
         let mut refined_best = run_best;
@@ -909,6 +909,117 @@ fn solve_until_target(
             }
             if refined_best.feasible && refined_best.travel_time <= target_travel_time {
                 break;
+            }
+        }
+
+        if refined_best.feasible {
+            let gap_pct =
+                100.0 * (refined_best.travel_time - instance.benchmark) / instance.benchmark;
+            println!(
+                "Restart {} best travel time = {:.4} (gap {:.2}%)",
+                run_idx, refined_best.travel_time, gap_pct
+            );
+        } else {
+            println!(
+                "Restart {} best solution is infeasible (fitness = {:.8})",
+                run_idx, refined_best.fitness
+            );
+        }
+
+        let is_better = best_overall.as_ref().is_none_or(|current_best| {
+            solution_cmp(&refined_best, current_best) == std::cmp::Ordering::Less
+        });
+        if is_better {
+            best_overall = Some(refined_best.clone());
+            best_fitness_history = fitness_history;
+            best_entropy_history = entropy_history;
+            best_feasible_history = feasible_history;
+        }
+
+        if refined_best.feasible && refined_best.travel_time <= target_travel_time {
+            println!(
+                "Target reached on restart {} (<= {:.4})",
+                run_idx, target_travel_time
+            );
+            break;
+        }
+    }
+
+    (
+        best_overall.expect("No solution produced across restarts"),
+        best_fitness_history,
+        best_entropy_history,
+        best_feasible_history,
+    )
+}
+
+fn multithreaded_solve_until_target(
+    instance: &read_json::Instance,
+) -> (Genome, Vec<f64>, Vec<f64>, Vec<Option<f64>>) {
+    const TARGET_GAP_PERCENT: f64 = 5.0;
+    const MAX_RUNS: usize = 10;
+    const POPULATION_SIZE: usize = 120;
+    const GENERATIONS: usize = 3000;
+    const REFINEMENT_CANDIDATES: usize = 6;
+    const ILS_ITERATIONS: usize = 300;
+    const ILS_LOCAL_SEARCH_STEPS: usize = 90;
+    const ILS_MAX_SHAKE_MOVES: usize = 16;
+
+    let target_travel_time = instance.benchmark * (1.0 + TARGET_GAP_PERCENT / 100.0);
+
+    let mut best_overall: Option<Genome> = None;
+    let mut best_fitness_history = Vec::new();
+    let mut best_entropy_history = Vec::new();
+    let mut best_feasible_history = Vec::new();
+
+    for run_idx in 1..=MAX_RUNS {
+        println!("\n=== Restart {}/{} ===", run_idx, MAX_RUNS);
+        let (run_best, fitness_history, entropy_history, feasible_history, population) =
+            genetic_algorithm(instance, POPULATION_SIZE, GENERATIONS);
+
+        let mut refinement_pool = get_feasible_genomes(&population);
+        refinement_pool.sort_by(solution_cmp);
+        refinement_pool.truncate(REFINEMENT_CANDIDATES - 1);
+        refinement_pool.push(run_best.clone());
+
+        let mut refined_best = run_best;
+        let refinement_total = refinement_pool.len();
+        let refined_candidates = std::thread::scope(|scope| {
+            let mut handles = Vec::with_capacity(refinement_total);
+
+            for (candidate_idx, candidate) in refinement_pool.into_iter().enumerate() {
+                let thread_number = candidate_idx + 1;
+                handles.push(scope.spawn(move || {
+                    let thread_id = std::thread::current().id();
+                    println!(
+                        "  [thread {} {:?}] Refining candidate {}/{}...",
+                        thread_number, thread_id, thread_number, refinement_total
+                    );
+                    let refined = iterated_local_search(
+                        candidate,
+                        instance,
+                        ILS_ITERATIONS,
+                        ILS_LOCAL_SEARCH_STEPS,
+                        ILS_MAX_SHAKE_MOVES,
+                    );
+                    println!(
+                        "  [thread {} {:?}] Finished candidate {}/{}",
+                        thread_number, thread_id, thread_number, refinement_total
+                    );
+                    refined
+                }));
+            }
+
+            let mut results = Vec::with_capacity(refinement_total);
+            for handle in handles {
+                results.push(handle.join().expect("Refinement thread panicked"));
+            }
+            results
+        });
+
+        for refined in refined_candidates {
+            if solution_cmp(&refined, &refined_best) == std::cmp::Ordering::Less {
+                refined_best = refined;
             }
         }
 
@@ -1229,7 +1340,7 @@ fn genetic_algorithm(
 fn main() {
     let instance = read_json("src/train/train_9.json");
     let (best, fitness_history, entropy_history, feasible_travel_time_history) =
-        solve_until_target(&instance);
+        multithreaded_solve_until_target(&instance);
 
     println!("\n=== Final Solution ===");
     println!("Best fitness: {}", best.fitness);
