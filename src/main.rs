@@ -14,6 +14,8 @@ struct Genome {
     fitness: f64,
     travel_time: f64,
     feasible: bool,
+    nurse_travel_times: Vec<f64>,
+    nurse_covered_demands: Vec<usize>,
 }
 
 impl Genome {
@@ -24,6 +26,8 @@ impl Genome {
             fitness: 0.0,
             travel_time: 0.0,
             feasible: true,
+            nurse_travel_times: Vec::new(),
+            nurse_covered_demands: Vec::new(),
         }
     }
 
@@ -45,6 +49,8 @@ impl Genome {
         let mut seen = vec![false; n_patients];
         let mut penalty = 0.0;
         self.feasible = true;
+        self.nurse_travel_times = vec![0.0; instance.nbr_nurses];
+        self.nurse_covered_demands = vec![0; instance.nbr_nurses];
 
         if self.sequence.len() != n_patients {
             penalty += STRUCTURE_PENALTY;
@@ -135,6 +141,8 @@ impl Genome {
             }
 
             total_travel_time += back_to_depot;
+            self.nurse_travel_times[nurse] = total_nurse_travel_time + back_to_depot;
+            self.nurse_covered_demands[nurse] = load;
 
             nurse += 1;
         }
@@ -308,6 +316,181 @@ fn plot_metrics(
         .draw()?;
 
     travel_chart.draw_series(LineSeries::new(feasible_travel_points, &GREEN))?;
+
+    root.present()?;
+    Ok(())
+}
+
+fn plot_nurse_route_network(
+    instance: &read_json::Instance,
+    best: &Genome,
+    output_path: &str,
+) -> Result<(), Box<dyn Error>> {
+    let root = BitMapBackend::new(output_path, (1200, 900)).into_drawing_area();
+    root.fill(&WHITE)?;
+
+    let mut min_x = instance.depot.x_coord as f64;
+    let mut max_x = instance.depot.x_coord as f64;
+    let mut min_y = instance.depot.y_coord as f64;
+    let mut max_y = instance.depot.y_coord as f64;
+
+    for patient in &instance.patients {
+        let px = patient.x_coord as f64;
+        let py = patient.y_coord as f64;
+        min_x = min_x.min(px);
+        max_x = max_x.max(px);
+        min_y = min_y.min(py);
+        max_y = max_y.max(py);
+    }
+
+    let pad_x = ((max_x - min_x) * 0.05).max(1.0);
+    let pad_y = ((max_y - min_y) * 0.05).max(1.0);
+
+    let mut chart = ChartBuilder::on(&root)
+        .caption("Nurse Route Network", ("sans-serif", 28))
+        .margin(20)
+        .x_label_area_size(40)
+        .y_label_area_size(40)
+        .build_cartesian_2d((min_x - pad_x)..(max_x + pad_x), (min_y - pad_y)..(max_y + pad_y))?;
+
+    chart.configure_mesh().x_desc("X").y_desc("Y").draw()?;
+
+    let depot_point = (instance.depot.x_coord as f64, instance.depot.y_coord as f64);
+    chart.draw_series(std::iter::once(Circle::new(depot_point, 7, BLACK.filled())))?;
+
+    for patient in &instance.patients {
+        chart.draw_series(std::iter::once(Circle::new(
+            (patient.x_coord as f64, patient.y_coord as f64),
+            2,
+            BLACK.mix(0.25).filled(),
+        )))?;
+    }
+
+    for nurse in 0..best.lengths.len() {
+        let start = best.lengths[..nurse].iter().sum::<usize>();
+        let end = start + best.lengths[nurse];
+        let route = &best.sequence[start..end];
+        if route.is_empty() {
+            continue;
+        }
+
+        let color = Palette99::pick(nurse);
+        let mut polyline = Vec::with_capacity(route.len() + 2);
+        polyline.push(depot_point);
+        for &patient_idx in route {
+            let patient = &instance.patients[patient_idx];
+            polyline.push((patient.x_coord as f64, patient.y_coord as f64));
+        }
+        polyline.push(depot_point);
+
+        chart
+            .draw_series(LineSeries::new(polyline.iter().copied(), &color))?
+            .label(format!("Nurse {}", nurse + 1))
+            .legend(move |(x, y)| PathElement::new(vec![(x, y), (x + 18, y)], Palette99::pick(nurse)));
+
+        chart.draw_series(
+            polyline
+                .iter()
+                .skip(1)
+                .take(route.len())
+                .map(|&p| Circle::new(p, 4, color.filled())),
+        )?;
+    }
+
+    chart
+        .configure_series_labels()
+        .background_style(WHITE.mix(0.8))
+        .border_style(BLACK)
+        .draw()?;
+
+    root.present()?;
+    Ok(())
+}
+
+fn plot_refinement_travel_time(
+    histories: &[(usize, Vec<f64>)],
+    target_travel_time: f64,
+    output_path: &str,
+    title: &str,
+) -> Result<(), Box<dyn Error>> {
+    if histories.is_empty() {
+        return Ok(());
+    }
+
+    let mut max_len = 0usize;
+    let mut travel_min = f64::INFINITY;
+    let mut travel_max = f64::NEG_INFINITY;
+
+    for (_, history) in histories {
+        if history.is_empty() {
+            continue;
+        }
+        max_len = max_len.max(history.len());
+        for &value in history {
+            travel_min = travel_min.min(value);
+            travel_max = travel_max.max(value);
+        }
+    }
+
+    if max_len == 0 || !travel_min.is_finite() || !travel_max.is_finite() {
+        return Ok(());
+    }
+
+    travel_min = travel_min.min(target_travel_time);
+    travel_max = travel_max.max(target_travel_time);
+    let travel_padding = if (travel_max - travel_min).abs() < f64::EPSILON {
+        (travel_max.abs() * 0.01).max(1e-12)
+    } else {
+        0.0
+    };
+
+    let root = BitMapBackend::new(output_path, (1200, 700)).into_drawing_area();
+    root.fill(&WHITE)?;
+
+    let mut chart = ChartBuilder::on(&root)
+        .caption(title, ("sans-serif", 24))
+        .margin(20)
+        .x_label_area_size(40)
+        .y_label_area_size(65)
+        .build_cartesian_2d(
+            0usize..max_len,
+            (travel_min - travel_padding)..(travel_max + travel_padding),
+        )?;
+
+    chart
+        .configure_mesh()
+        .x_desc("Iteration")
+        .y_desc("Best Travel Time")
+        .draw()?;
+
+    for (idx, (candidate_number, history)) in histories.iter().enumerate() {
+        if history.is_empty() {
+            continue;
+        }
+        chart
+            .draw_series(LineSeries::new(
+                history.iter().enumerate().map(|(i, v)| (i, *v)),
+                &Palette99::pick(idx),
+            ))?
+            .label(format!("Candidate {}", candidate_number))
+            .legend(move |(x, y)| {
+                PathElement::new(vec![(x, y), (x + 20, y)], Palette99::pick(idx))
+            });
+    }
+
+    chart
+        .draw_series(LineSeries::new(
+            (0..max_len).map(|i| (i, target_travel_time)),
+            &BLACK.mix(0.4),
+        ))?
+        .label("Target (benchmark +5%)")
+        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], BLACK.mix(0.4)));
+
+    chart
+        .configure_series_labels()
+        .background_style(WHITE.mix(0.8))
+        .border_style(BLACK)
+        .draw()?;
 
     root.present()?;
     Ok(())
@@ -799,11 +982,12 @@ fn iterated_local_search(
     iterations: usize,
     local_search_steps: usize,
     max_shake_moves: usize,
-) -> Genome {
+) -> (Genome, Vec<f64>) {
     // Local search + mutate + local search, repeated until no improvement.
     let mut rng = rng();
     let mut current = local_search(seed, instance, local_search_steps);
     let mut best = current.clone();
+    let mut best_travel_history = vec![best.travel_time];
     let mut iterations_since_improvement = 0usize;
     let mut iteration = 0;
 
@@ -818,6 +1002,7 @@ fn iterated_local_search(
             best = candidate.clone();
             current = candidate;
             iterations_since_improvement = 0;
+            best_travel_history.push(best.travel_time);
             continue;
         }
 
@@ -843,6 +1028,7 @@ fn iterated_local_search(
         }
         iterations_since_improvement += 1;
         iteration += 1;
+        best_travel_history.push(best.travel_time);
 
         if (iteration + 1) % 50 == 0 {
             if best.feasible {
@@ -857,7 +1043,7 @@ fn iterated_local_search(
         }
     }
 
-    best
+    (best, best_travel_history)
 }
 
 fn solve_until_target(
@@ -867,7 +1053,7 @@ fn solve_until_target(
     const MAX_RUNS: usize = 10;
     const POPULATION_SIZE: usize = 120;
     const GENERATIONS: usize = 3000;
-    const REFINEMENT_CANDIDATES: usize = 6;
+    const REFINEMENT_CANDIDATES: usize = 8;
     const ILS_ITERATIONS: usize = 300;
     const ILS_LOCAL_SEARCH_STEPS: usize = 90;
     const ILS_MAX_SHAKE_MOVES: usize = 16;
@@ -891,25 +1077,42 @@ fn solve_until_target(
 
         let mut refined_best = run_best;
         let refinement_total = refinement_pool.len();
+        let mut refinement_histories = Vec::with_capacity(refinement_total);
         for (candidate_idx, candidate) in refinement_pool.into_iter().enumerate() {
             println!(
                 "  Refining candidate {}/{}...",
                 candidate_idx + 1,
                 refinement_total
             );
-            let refined = iterated_local_search(
+            let (refined, history) = iterated_local_search(
                 candidate,
                 instance,
                 ILS_ITERATIONS,
                 ILS_LOCAL_SEARCH_STEPS,
                 ILS_MAX_SHAKE_MOVES,
             );
+            refinement_histories.push((candidate_idx + 1, history));
             if solution_cmp(&refined, &refined_best) == std::cmp::Ordering::Less {
                 refined_best = refined;
             }
             if refined_best.feasible && refined_best.travel_time <= target_travel_time {
                 break;
             }
+        }
+
+        let refinement_plot_path = format!("refinement_travel_time_sequential_restart_{}.png", run_idx);
+        if let Err(err) = plot_refinement_travel_time(
+            &refinement_histories,
+            target_travel_time,
+            &refinement_plot_path,
+            &format!("Sequential Refinement Travel Time (Restart {})", run_idx),
+        ) {
+            eprintln!(
+                "Failed to plot sequential refinement travel time for restart {}: {}",
+                run_idx, err
+            );
+        } else {
+            println!("Saved refinement plot: {}", refinement_plot_path);
         }
 
         if refined_best.feasible {
@@ -960,7 +1163,7 @@ fn multithreaded_solve_until_target(
     const MAX_RUNS: usize = 10;
     const POPULATION_SIZE: usize = 120;
     const GENERATIONS: usize = 3000;
-    const REFINEMENT_CANDIDATES: usize = 6;
+    const REFINEMENT_CANDIDATES: usize = 8;
     const ILS_ITERATIONS: usize = 300;
     const ILS_LOCAL_SEARCH_STEPS: usize = 90;
     const ILS_MAX_SHAKE_MOVES: usize = 16;
@@ -984,29 +1187,24 @@ fn multithreaded_solve_until_target(
 
         let mut refined_best = run_best;
         let refinement_total = refinement_pool.len();
-        let refined_candidates = std::thread::scope(|scope| {
+        let mut refined_candidates = std::thread::scope(|scope| {
             let mut handles = Vec::with_capacity(refinement_total);
 
             for (candidate_idx, candidate) in refinement_pool.into_iter().enumerate() {
-                let thread_number = candidate_idx + 1;
+                let candidate_number = candidate_idx + 1;
+                println!(
+                    "  Refining candidate {}/{} (threaded)...",
+                    candidate_number, refinement_total
+                );
                 handles.push(scope.spawn(move || {
-                    let thread_id = std::thread::current().id();
-                    println!(
-                        "  [thread {} {:?}] Refining candidate {}/{}...",
-                        thread_number, thread_id, thread_number, refinement_total
-                    );
-                    let refined = iterated_local_search(
+                    let (refined, history) = iterated_local_search(
                         candidate,
                         instance,
                         ILS_ITERATIONS,
                         ILS_LOCAL_SEARCH_STEPS,
                         ILS_MAX_SHAKE_MOVES,
                     );
-                    println!(
-                        "  [thread {} {:?}] Finished candidate {}/{}",
-                        thread_number, thread_id, thread_number, refinement_total
-                    );
-                    refined
+                    (candidate_number, refined, history)
                 }));
             }
 
@@ -1017,7 +1215,27 @@ fn multithreaded_solve_until_target(
             results
         });
 
-        for refined in refined_candidates {
+        refined_candidates.sort_by_key(|(thread_number, _, _)| *thread_number);
+        let refinement_histories: Vec<(usize, Vec<f64>)> = refined_candidates
+            .iter()
+            .map(|(thread_number, _, history)| (*thread_number, history.clone()))
+            .collect();
+        let refinement_plot_path = format!("refinement_travel_time_threaded_restart_{}.png", run_idx);
+        if let Err(err) = plot_refinement_travel_time(
+            &refinement_histories,
+            target_travel_time,
+            &refinement_plot_path,
+            &format!("Threaded Refinement Travel Time (Restart {})", run_idx),
+        ) {
+            eprintln!(
+                "Failed to plot threaded refinement travel time for restart {}: {}",
+                run_idx, err
+            );
+        } else {
+            println!("Saved refinement plot: {}", refinement_plot_path);
+        }
+
+        for (_, refined, _) in refined_candidates {
             if solution_cmp(&refined, &refined_best) == std::cmp::Ordering::Less {
                 refined_best = refined;
             }
@@ -1343,9 +1561,54 @@ fn main() {
         multithreaded_solve_until_target(&instance);
 
     println!("\n=== Final Solution ===");
-    println!("Best fitness: {}", best.fitness);
+    println!("Nurse capacity: {}", instance.capacity_nurse);
+    println!("Depot return time: {}", instance.depot.return_time);
+    println!("\n----------------------");
+    for nurse in 0..best.lengths.len() {
+        let start = best.lengths[..nurse].iter().sum::<usize>();
+        let end = start + best.lengths[nurse];
+        let route = &best.sequence[start..end];
+        let mut total_time = 0.0;
+        let mut current_location = 0usize;
+        let mut patient_sequence_with_times = Vec::with_capacity(route.len());
+
+        for &patient_idx in route {
+            let patient = &instance.patients[patient_idx];
+            let patient_node = patient_idx + 1;
+            let travel_time = get_travel_time(&instance.travel_times, current_location, patient_node);
+            total_time += travel_time;
+
+            let visit_time = total_time.max(patient.start_time as f64);
+            let leave_time = visit_time + patient.care_time as f64;
+            patient_sequence_with_times.push(format!(
+                "P{} ({:.1} - {:.1}) [{:.1} - {:.1}]",
+                patient_idx + 1,
+                visit_time,
+                leave_time,
+                patient.start_time,
+                patient.end_time,
+            ));
+
+            total_time = leave_time;
+            current_location = patient_node;
+        }
+
+        let patient_sequence_text = if patient_sequence_with_times.is_empty() {
+            String::from("None")
+        } else {
+            patient_sequence_with_times.join(" -> ")
+        };
+
+        println!(
+            "Nurse: {} Route duration: {} Covered demand: {} Patient sequence: {}",
+            nurse + 1,
+            best.nurse_travel_times[nurse],
+            best.nurse_covered_demands[nurse],
+            patient_sequence_text
+        );
+    }
+    println!("----------------------\n");
     println!("Total travel time: {}", best.travel_time);
-    println!("Benchmark: {}", instance.benchmark);
 
     plot_metrics(
         &fitness_history,
@@ -1354,4 +1617,6 @@ fn main() {
         "multi_start_ils_metrics.png",
     )
     .expect("Failed to plot metrics");
+    plot_nurse_route_network(&instance, &best, "nurse_route_network.png")
+        .expect("Failed to plot nurse route network");
 }
