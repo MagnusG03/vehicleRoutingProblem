@@ -351,7 +351,10 @@ fn plot_nurse_route_network(
         .margin(20)
         .x_label_area_size(40)
         .y_label_area_size(40)
-        .build_cartesian_2d((min_x - pad_x)..(max_x + pad_x), (min_y - pad_y)..(max_y + pad_y))?;
+        .build_cartesian_2d(
+            (min_x - pad_x)..(max_x + pad_x),
+            (min_y - pad_y)..(max_y + pad_y),
+        )?;
 
     chart.configure_mesh().x_desc("X").y_desc("Y").draw()?;
 
@@ -386,7 +389,9 @@ fn plot_nurse_route_network(
         chart
             .draw_series(LineSeries::new(polyline.iter().copied(), &color))?
             .label(format!("Nurse {}", nurse + 1))
-            .legend(move |(x, y)| PathElement::new(vec![(x, y), (x + 18, y)], Palette99::pick(nurse)));
+            .legend(move |(x, y)| {
+                PathElement::new(vec![(x, y), (x + 18, y)], Palette99::pick(nurse))
+            });
 
         chart.draw_series(
             polyline
@@ -496,127 +501,25 @@ fn plot_refinement_travel_time(
     Ok(())
 }
 
-fn create_seeded_genome(instance: &read_json::Instance) -> Genome {
-    const LATENESS_PENALTY: f64 = 1000.0;
-    const OVERLOAD_PENALTY: f64 = 3000.0;
-    const RETURN_LATE_PENALTY: f64 = 800.0;
-    const ROUTE_BALANCE_WEIGHT: f64 = 2.0;
-    const SCORE_NOISE: f64 = 1e-4;
-
-    let n_patients = instance.patients.len();
-    let n_nurses = instance.nbr_nurses;
-    let mut rng = rng();
-
-    let mut patient_order: Vec<usize> = (0..n_patients).collect();
-    patient_order.sort_by(|&a, &b| {
-        let pa = &instance.patients[a];
-        let pb = &instance.patients[b];
-        pa.end_time
-            .cmp(&pb.end_time)
-            .then(pa.start_time.cmp(&pb.start_time))
-            .then(pb.demand.cmp(&pa.demand))
-    });
-
-    if n_patients > 1 {
-        for chunk in patient_order.chunks_mut(4) {
-            chunk.shuffle(&mut rng);
-        }
-    }
-
-    let mut routes: Vec<Vec<usize>> = vec![Vec::new(); n_nurses];
-    let mut route_time = vec![0.0f64; n_nurses];
-    let mut route_load = vec![0usize; n_nurses];
-    let mut route_location = vec![0usize; n_nurses];
-
-    for patient in patient_order {
-        let patient_info = &instance.patients[patient];
-        let patient_node = patient + 1;
-        let average_route_size =
-            (routes.iter().map(|r| r.len()).sum::<usize>() as f64 + 1.0) / n_nurses as f64;
-
-        let mut best_nurse = 0usize;
-        let mut best_score = f64::INFINITY;
-        let mut best_time = 0.0f64;
-        let mut best_load = 0usize;
-
-        for nurse in 0..n_nurses {
-            let travel =
-                get_travel_time(&instance.travel_times, route_location[nurse], patient_node);
-
-            let mut projected_time = route_time[nurse] + travel;
-            if projected_time < patient_info.start_time as f64 {
-                projected_time = patient_info.start_time as f64;
-            }
-            projected_time += patient_info.care_time as f64;
-
-            let projected_load = route_load[nurse] + patient_info.demand;
-            let lateness = (projected_time - patient_info.end_time as f64).max(0.0);
-            let overload = projected_load.saturating_sub(instance.capacity_nurse);
-            let return_lateness = (projected_time
-                + get_travel_time(&instance.travel_times, patient_node, 0)
-                - instance.depot.return_time as f64)
-                .max(0.0);
-            let route_size_after_insert = routes[nurse].len() as f64 + 1.0;
-            let balance_penalty = (route_size_after_insert - average_route_size).abs();
-
-            let score = travel
-                + LATENESS_PENALTY * lateness
-                + OVERLOAD_PENALTY * overload as f64
-                + RETURN_LATE_PENALTY * return_lateness
-                + ROUTE_BALANCE_WEIGHT * balance_penalty
-                + rng.random_range(0.0..SCORE_NOISE);
-
-            if score < best_score {
-                best_score = score;
-                best_nurse = nurse;
-                best_time = projected_time;
-                best_load = projected_load;
-            }
-        }
-
-        routes[best_nurse].push(patient);
-        route_time[best_nurse] = best_time;
-        route_load[best_nurse] = best_load;
-        route_location[best_nurse] = patient_node;
-    }
-
-    let mut sequence = Vec::with_capacity(n_patients);
-    let mut lengths = vec![0usize; n_nurses];
-    for nurse in 0..n_nurses {
-        lengths[nurse] = routes[nurse].len();
-        sequence.extend(routes[nurse].iter().copied());
-    }
-
-    let mut genome = Genome::new(sequence, lengths);
-    genome.calculate_fitness(instance);
-    genome
-}
-
 fn populate(population_size: usize, instance: &read_json::Instance) -> Vec<Genome> {
-    const SEEDED_RATE: f64 = 0.85;
-
     let n_patients = instance.patients.len();
     let n_nurses = instance.nbr_nurses;
     let mut rng = rng();
     let mut population = Vec::with_capacity(population_size);
 
     for _ in 0..population_size {
-        if rng.random_bool(SEEDED_RATE) {
-            population.push(create_seeded_genome(instance));
-        } else {
-            let mut sequence: Vec<usize> = (0..n_patients).collect();
-            sequence.shuffle(&mut rng);
+        let mut sequence: Vec<usize> = (0..n_patients).collect();
+        sequence.shuffle(&mut rng);
 
-            let mut lengths = vec![0usize; n_nurses];
-            for _ in 0..n_patients {
-                let k = rng.random_range(0..n_nurses);
-                lengths[k] += 1;
-            }
-
-            let mut genome = Genome::new(sequence, lengths);
-            genome.calculate_fitness(instance);
-            population.push(genome);
+        let mut lengths = vec![0usize; n_nurses];
+        for _ in 0..n_patients {
+            let k = rng.random_range(0..n_nurses);
+            lengths[k] += 1;
         }
+
+        let mut genome = Genome::new(sequence, lengths);
+        genome.calculate_fitness(instance);
+        population.push(genome);
     }
 
     population
@@ -1100,7 +1003,8 @@ fn solve_until_target(
             }
         }
 
-        let refinement_plot_path = format!("refinement_travel_time_sequential_restart_{}.png", run_idx);
+        let refinement_plot_path =
+            format!("refinement_travel_time_sequential_restart_{}.png", run_idx);
         if let Err(err) = plot_refinement_travel_time(
             &refinement_histories,
             target_travel_time,
@@ -1220,7 +1124,8 @@ fn multithreaded_solve_until_target(
             .iter()
             .map(|(thread_number, _, history)| (*thread_number, history.clone()))
             .collect();
-        let refinement_plot_path = format!("refinement_travel_time_threaded_restart_{}.png", run_idx);
+        let refinement_plot_path =
+            format!("refinement_travel_time_threaded_restart_{}.png", run_idx);
         if let Err(err) = plot_refinement_travel_time(
             &refinement_histories,
             target_travel_time,
@@ -1479,6 +1384,9 @@ fn genetic_algorithm(
     let mut generation = 0;
     let mut generations_since_improvement = 0;
 
+    let mut last_fitness = 0.0;
+    let mut current_fitness = 0.0;
+
     while generations_since_improvement < 1000 {
         current_entropy = calculate_entropy(&population);
 
@@ -1495,7 +1403,8 @@ fn genetic_algorithm(
             population_size,
         );
 
-        fitness_history.push(best_fitness(&population));
+        current_fitness = best_fitness(&population);
+        fitness_history.push(current_fitness);
         entropy_history.push(calculate_entropy(&population));
         if let Some(lowest_feasible) = lowest_feasible_travel_time(&population) {
             running_lowest_feasible_travel_time = Some(
@@ -1529,11 +1438,15 @@ fn genetic_algorithm(
                 .is_none_or(|best| current_best_feasible.travel_time < best.travel_time)
             {
                 global_best_feasible = Some(current_best_feasible.clone());
-                generations_since_improvement = 0;
             }
         }
         generation += 1;
-        generations_since_improvement += 1;
+        if current_fitness > last_fitness {
+            generations_since_improvement = 0;
+        } else {
+            generations_since_improvement += 1;
+        }
+        last_fitness = current_fitness;
     }
 
     let best = if let Some(best_feasible) = global_best_feasible {
@@ -1575,7 +1488,8 @@ fn main() {
         for &patient_idx in route {
             let patient = &instance.patients[patient_idx];
             let patient_node = patient_idx + 1;
-            let travel_time = get_travel_time(&instance.travel_times, current_location, patient_node);
+            let travel_time =
+                get_travel_time(&instance.travel_times, current_location, patient_node);
             total_time += travel_time;
 
             let visit_time = total_time.max(patient.start_time as f64);
