@@ -1388,6 +1388,15 @@ fn genetic_algorithm(
     let mut current_fitness = 0.0;
 
     while generations_since_improvement < 1000 {
+        if generation > 0 && generation % 500 == 0 {
+            // Run local search
+            for genome in population.iter_mut() {
+                if genome.feasible {
+                    *genome = local_search(genome.clone(), instance, 20);
+                }
+            }
+        }
+
         current_entropy = calculate_entropy(&population);
 
         scaling_factor = initial_scaling_factor * current_entropy / initial_entropy.max(1e-12);
