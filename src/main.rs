@@ -949,6 +949,7 @@ fn iterated_local_search(
     (best, best_travel_history)
 }
 
+#[allow(dead_code)]
 fn solve_until_target(
     instance: &read_json::Instance,
 ) -> (Genome, Vec<f64>, Vec<f64>, Vec<Option<f64>>) {
@@ -1385,7 +1386,7 @@ fn genetic_algorithm(
     let mut generations_since_improvement = 0;
 
     let mut last_fitness = 0.0;
-    let mut current_fitness = 0.0;
+    let mut current_fitness;
 
     while generations_since_improvement < 1000 {
         if generation > 0 && generation % 500 == 0 {
@@ -1483,6 +1484,7 @@ fn main() {
         multithreaded_solve_until_target(&instance);
 
     println!("\n=== Final Solution ===");
+    println!("Instance: {}", instance.instance_name);
     println!("Nurse capacity: {}", instance.capacity_nurse);
     println!("Depot return time: {}", instance.depot.return_time);
     println!("\n----------------------");
