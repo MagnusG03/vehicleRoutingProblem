@@ -386,8 +386,16 @@ fn plot_nurse_route_network(
         }
         polyline.push(depot_point);
 
+        chart.draw_series(LineSeries::new(
+            polyline.iter().copied(),
+            ShapeStyle::from(&BLACK).stroke_width(4),
+        ))?;
+
         chart
-            .draw_series(LineSeries::new(polyline.iter().copied(), &color))?
+            .draw_series(LineSeries::new(
+                polyline.iter().copied(),
+                ShapeStyle::from(&color).stroke_width(2),
+            ))?
             .label(format!("Nurse {}", nurse + 1))
             .legend(move |(x, y)| {
                 PathElement::new(vec![(x, y), (x + 18, y)], Palette99::pick(nurse))
@@ -1392,9 +1400,7 @@ fn genetic_algorithm(
         if generation > 0 && generation % 500 == 0 {
             // Run local search
             for genome in population.iter_mut() {
-                if genome.feasible {
-                    *genome = local_search(genome.clone(), instance, 20);
-                }
+                *genome = local_search(genome.clone(), instance, 20);
             }
         }
 
