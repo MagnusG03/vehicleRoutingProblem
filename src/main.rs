@@ -1196,7 +1196,7 @@ fn multithreaded_solve_until_target(
     )
 }
 
-fn elitism_scaling_probabilistic_crowding_repopulation(
+fn elitism_generalized_crowding_repopulation(
     population: &mut Vec<Genome>,
     instance: &read_json::Instance,
     mutation_rate: f64,
@@ -1410,7 +1410,7 @@ fn genetic_algorithm(
         mutation_rate =
             initial_mutation_rate * (1.0 - current_entropy / initial_entropy.max(1e-12));
 
-        elitism_scaling_probabilistic_crowding_repopulation(
+        elitism_generalized_crowding_repopulation(
             &mut population,
             instance,
             mutation_rate,
