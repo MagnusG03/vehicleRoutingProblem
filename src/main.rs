@@ -892,7 +892,6 @@ fn iterated_local_search(
     instance: &read_json::Instance,
     iterations: usize,
     local_search_steps: usize,
-    max_shake_moves: usize,
 ) -> (Genome, Vec<f64>) {
     // Local search + mutate + local search, repeated until no improvement.
     let mut rng = rng();
@@ -904,7 +903,7 @@ fn iterated_local_search(
 
     while iterations_since_improvement < iterations {
         let mut candidate = current.clone();
-        let shake_moves = (2 + iterations_since_improvement / 40).min(max_shake_moves.max(2));
+        let shake_moves = 2 + iterations_since_improvement / 40;
         random_mutate(&mut candidate, shake_moves, 1.0);
         candidate.calculate_fitness(instance);
         candidate = local_search(candidate, instance, local_search_steps);
@@ -968,7 +967,6 @@ fn solve_until_target(
     const REFINEMENT_CANDIDATES: usize = 8;
     const ILS_ITERATIONS: usize = 300;
     const ILS_LOCAL_SEARCH_STEPS: usize = 90;
-    const ILS_MAX_SHAKE_MOVES: usize = 16;
 
     let target_travel_time = instance.benchmark * (1.0 + TARGET_GAP_PERCENT / 100.0);
 
@@ -1001,7 +999,6 @@ fn solve_until_target(
                 instance,
                 ILS_ITERATIONS,
                 ILS_LOCAL_SEARCH_STEPS,
-                ILS_MAX_SHAKE_MOVES,
             );
             refinement_histories.push((candidate_idx + 1, history));
             if solution_cmp(&refined, &refined_best) == std::cmp::Ordering::Less {
@@ -1079,7 +1076,6 @@ fn multithreaded_solve_until_target(
     const REFINEMENT_CANDIDATES: usize = 8;
     const ILS_ITERATIONS: usize = 300;
     const ILS_LOCAL_SEARCH_STEPS: usize = 90;
-    const ILS_MAX_SHAKE_MOVES: usize = 16;
 
     let target_travel_time = instance.benchmark * (1.0 + TARGET_GAP_PERCENT / 100.0);
 
@@ -1115,7 +1111,6 @@ fn multithreaded_solve_until_target(
                         instance,
                         ILS_ITERATIONS,
                         ILS_LOCAL_SEARCH_STEPS,
-                        ILS_MAX_SHAKE_MOVES,
                     );
                     (candidate_number, refined, history)
                 }));
