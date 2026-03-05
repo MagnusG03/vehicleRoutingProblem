@@ -1480,7 +1480,7 @@ fn genetic_algorithm(
 }
 
 fn main() {
-    let instance = read_json("src/train/train_9.json");
+    let instance = read_json("src/test/test_instance_3.json");
     let (best, fitness_history, entropy_history, feasible_travel_time_history) =
         multithreaded_solve_until_target(&instance);
 
