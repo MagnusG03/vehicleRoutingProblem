@@ -2,9 +2,19 @@
 name = "vehicleRoutingProblem"
 version = "0.1.0"
 edition = "2024"
+default-run = "vehicleRoutingProblem"
+
+[lib]
+name = "vrp"
+path = "src/lib.rs"
 
 [dependencies]
+flamegraph = "0.6.11"
 plotters = "0.3.7"
 rand = "0.10.0"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
+
+[profile.release]
+opt-level = 2
+debug = false

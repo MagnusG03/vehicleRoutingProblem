@@ -1,0 +1,39 @@
+
+=== Final Solution ===
+Instance: test_instance_2
+Nurse capacity: 204
+Depot return time: 1316
+
+----------------------
+Nurse  1:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse  2:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse  3:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse  4:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse  5:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse  6:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse  7:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse  8:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse  9:  Route duration:  164.6  Covered demand: 204  Patient sequence: 02 (51.9 - 130.9) [38 - 191] -> 68 (140.8 - 245.8) [128 - 1323] -> 10 (262.8 - 363.8) [2 - 673] -> 88 (537.0 - 598.0) [537 - 1408] -> 17 (609.0 - 677.0) [569 - 1658] -> 04 (725.0 - 839.0) [725 - 1131] -> 42 (855.8 - 967.8) [675 - 1365] -> 03 (979.9 - 1064.9) [436 - 1247]
+Nurse 10:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse 11:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse 12:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse 13:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse 14:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse 15:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse 16:  Route duration:  174.8  Covered demand: 193  Patient sequence: 50 (183.0 - 260.0) [183 - 415] -> 22 (288.0 - 350.0) [288 - 479] -> 27 (424.0 - 536.0) [424 - 1508] -> 11 (540.0 - 634.0) [26 - 737] -> 34 (663.0 - 734.0) [663 - 1322] -> 13 (757.0 - 823.0) [757 - 1753] -> 26 (823.0 - 918.0) [691 - 1398] -> 64 (948.8 - 1044.8) [678 - 1403]
+Nurse 17:  Route duration:   76.2  Covered demand: 152  Patient sequence: 62 (332.0 - 396.0) [332 - 822] -> 31 (462.0 - 552.0) [462 - 562] -> 87 (700.0 - 810.0) [700 - 961] -> 61 (818.2 - 881.2) [737 - 1917] -> 83 (884.4 - 961.4) [743 - 1271]
+Nurse 18:  Route duration:  101.6  Covered demand: 183  Patient sequence: 56 (164.0 - 236.0) [164 - 324] -> 36 (246.8 - 307.8) [158 - 432] -> 08 (316.8 - 412.8) [249 - 1275] -> 58 (416.4 - 498.4) [119 - 550] -> 32 (500.6 - 609.6) [225 - 1333] -> 66 (622.8 - 717.8) [506 - 765] -> 52 (730.4 - 793.4) [617 - 845]
+Nurse 19:  Route duration:  122.9  Covered demand: 198  Patient sequence: 85 (122.0 - 216.0) [122 - 644] -> 79 (258.0 - 358.0) [258 - 1234] -> 41 (555.0 - 672.0) [555 - 778] -> 18 (759.0 - 849.0) [759 - 1014] -> 30 (853.1 - 941.1) [563 - 1704] -> 70 (946.1 - 1045.1) [573 - 1736] -> 86 (1050.1 - 1166.1) [782 - 1827] -> 49 (1179.6 - 1269.6) [646 - 1319]
+Nurse 20:  Route duration:  159.4  Covered demand: 203  Patient sequence: 12 (50.9 - 147.9) [41 - 469] -> 90 (201.0 - 275.0) [201 - 1315] -> 53 (301.0 - 415.0) [301 - 597] -> 07 (420.0 - 534.0) [144 - 650] -> 75 (542.6 - 647.6) [301 - 1427] -> 69 (657.5 - 766.5) [299 - 1033] -> 92 (772.9 - 833.9) [552 - 1000] -> 47 (839.9 - 951.9) [662 - 1226] -> 93 (980.8 - 1098.8) [627 - 1798]
+Nurse 21:  Route duration:  116.7  Covered demand: 121  Patient sequence: 43 (52.0 - 137.0) [52 - 317] -> 77 (579.0 - 696.0) [579 - 883] -> 63 (787.0 - 850.0) [787 - 1689] -> 28 (873.1 - 950.1) [440 - 1476] -> 38 (970.7 - 1056.7) [382 - 1306]
+Nurse 22:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse 23:  Route duration:  131.9  Covered demand: 187  Patient sequence: 15 (211.0 - 329.0) [211 - 508] -> 81 (344.0 - 407.0) [206 - 642] -> 21 (411.5 - 500.5) [281 - 743] -> 37 (503.5 - 602.5) [76 - 727] -> 09 (657.0 - 754.0) [657 - 1719] -> 05 (768.1 - 853.1) [196 - 1294] -> 44 (857.4 - 960.4) [674 - 1010] -> 55 (968.0 - 1060.0) [50 - 1211] -> 67 (1066.1 - 1155.1) [756 - 1557]
+Nurse 24:  Route duration:    0.0  Covered demand:   0  Patient sequence: None
+Nurse 25:  Route duration:   97.4  Covered demand: 197  Patient sequence: 23 (49.0 - 121.0) [49 - 470] -> 25 (136.3 - 234.3) [109 - 434] -> 59 (294.0 - 378.0) [294 - 540] -> 76 (382.1 - 495.1) [367 - 699] -> 20 (514.3 - 631.3) [494 - 817] -> 40 (641.5 - 729.5) [182 - 1190] -> 65 (736.5 - 846.5) [412 - 884] -> 57 (855.1 - 931.1) [651 - 1159]
+Nurse 26:  Route duration:  128.3  Covered demand: 186  Patient sequence: 72 (221.0 - 323.0) [221 - 1137] -> 74 (339.8 - 444.8) [227 - 1416] -> 29 (460.6 - 558.6) [255 - 669] -> 80 (565.6 - 637.6) [133 - 979] -> 91 (657.6 - 743.6) [583 - 772] -> 94 (759.7 - 870.7) [726 - 1089] -> 16 (892.9 - 1002.9) [599 - 1171]
+Nurse 27:  Route duration:   71.5  Covered demand: 204  Patient sequence: 73 (54.0 - 166.0) [54 - 1226] -> 89 (175.8 - 259.8) [114 - 675] -> 24 (267.7 - 382.7) [191 - 635] -> 78 (702.0 - 797.0) [702 - 1877] -> 39 (803.7 - 921.7) [729 - 930] -> 60 (926.2 - 995.2) [719 - 996] -> 14 (1006.2 - 1124.2) [241 - 1360]
+Nurse 28:  Route duration:  129.9  Covered demand: 198  Patient sequence: 33 (19.0 - 139.0) [19 - 890] -> 46 (269.0 - 361.0) [269 - 571] -> 51 (373.8 - 487.8) [217 - 989] -> 82 (505.0 - 572.0) [505 - 1020] -> 19 (579.2 - 658.2) [145 - 1078] -> 45 (668.2 - 771.2) [643 - 1618] -> 48 (802.1 - 875.1) [581 - 964]
+Nurse 29:  Route duration:  126.3  Covered demand: 186  Patient sequence: 54 (422.0 - 541.0) [422 - 710] -> 06 (551.6 - 629.6) [304 - 679] -> 01 (650.8 - 732.8) [524 - 1236] -> 84 (747.2 - 819.2) [32 - 1171] -> 71 (832.3 - 903.3) [319 - 1182] -> 35 (908.9 - 984.9) [266 - 1010]
+----------------------
+
+Total travel time: 1601.547748684944

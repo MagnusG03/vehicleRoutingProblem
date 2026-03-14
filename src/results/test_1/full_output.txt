@@ -1,0 +1,913 @@
+cargo run --release -- \
+  --dataset test_1 \
+  --max-generations 10000 \
+  --population-size 200 \
+  --max-runs 10 \
+  --refinement-candidates 5 \
+  --elite-size 10 \
+  --initial-mutation-rate 0.852641 \
+  --initial-scaling-factor 2.092114 \
+  --ls-every 100 \
+  --ls-steps 24 \
+  --ils-iterations 250 \
+  --ils-local-search-steps 70 \
+  --stagnation-limit 2156
+    Finished `release` profile [optimized] target(s) in 0.23s
+     Running `target/release/vehicleRoutingProblem --dataset test_1 --max-generations 10000 --population-size 200 --max-runs 10 --refinement-candidates 5 --elite-size 10 --initial-mutation-rate 0.852641 --initial-scaling-factor 2.092114 --ls-every 100 --ls-steps 24 --ils-iterations 250 --ils-local-search-steps 70 --stagnation-limit 2156`
+Dataset: src/data/test/test_1.json
+Config: max_runs=10, population_size=200, generations=10000, refinement_candidates=5, ils_iterations=250, ils_local_search_steps=70, elite_size=10, initial_mutation_rate=0.852641, initial_scaling_factor=2.092114, ls_every=100, ls_steps=24, stagnation_limit=2156
+
+=== Run 1/10 ===
+Generation 1: Best Fitness = 0.000003965985528572832, Running Best Fitness = 0.000003965985528572832, Entropy = 0.9279302928961568, Lowest Feasible Travel Time = None
+Generation 100: Best Fitness = 0.00000675054121930055, Running Best Fitness = 0.00000675054121930055, Entropy = 0.8614711155054111, Lowest Feasible Travel Time = None
+Generation 200: Best Fitness = 0.000013608718665185563, Running Best Fitness = 0.000013608718665185563, Entropy = 0.8017585846386672, Lowest Feasible Travel Time = None
+Generation 300: Best Fitness = 0.00006791006130190477, Running Best Fitness = 0.00006791006130190477, Entropy = 0.3845221593748338, Lowest Feasible Travel Time = None
+Generation 400: Best Fitness = 0.000249543115955185, Running Best Fitness = 0.000249543115955185, Entropy = 0.13939018182090462, Lowest Feasible Travel Time = 4006.3235287307552
+Generation 500: Best Fitness = 0.0002979583866772043, Running Best Fitness = 0.0002979583866772043, Entropy = 0.1693490700951231, Lowest Feasible Travel Time = 3355.173360823565
+Generation 600: Best Fitness = 0.000357311156415369, Running Best Fitness = 0.000357311156415369, Entropy = 0.07998103831172253, Lowest Feasible Travel Time = 2797.6811551932474
+Generation 700: Best Fitness = 0.00041091449507741224, Running Best Fitness = 0.00041091449507741224, Entropy = 0.10125238148728094, Lowest Feasible Travel Time = 2432.596312565245
+Generation 800: Best Fitness = 0.00044189035389596317, Running Best Fitness = 0.00044189035389596317, Entropy = 0.052302323425619614, Lowest Feasible Travel Time = 2262.004818239223
+Generation 900: Best Fitness = 0.00047756223324060116, Running Best Fitness = 0.00047756223324060116, Entropy = 0.028171924152227676, Lowest Feasible Travel Time = 2092.967927937444
+Generation 1000: Best Fitness = 0.000529173280081803, Running Best Fitness = 0.000529173280081803, Entropy = 0.09795417821369962, Lowest Feasible Travel Time = 1888.740161947356
+Generation 1100: Best Fitness = 0.0005569520708043341, Running Best Fitness = 0.0005569520708043341, Entropy = 0.01937285611896491, Lowest Feasible Travel Time = 1794.4866359610241
+Generation 1200: Best Fitness = 0.0005854219312722678, Running Best Fitness = 0.0005854219312722678, Entropy = 0, Lowest Feasible Travel Time = 1707.1696919463723
+Generation 1300: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 1400: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 1500: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 1600: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 1700: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 1800: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 1900: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 2000: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 2100: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 2200: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 2300: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 2400: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 2500: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 2600: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 2700: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 2800: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 2900: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 3000: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 3100: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 3200: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+Generation 3300: Best Fitness = 0.0005870386457879684, Running Best Fitness = 0.0005870386457879684, Entropy = 0, Lowest Feasible Travel Time = 1702.4653632687557
+  Refining candidate 1/5 (threaded)...
+  Refining candidate 2/5 (threaded)...
+  Refining candidate 3/5 (threaded)...
+  Refining candidate 4/5 (threaded)...
+  Refining candidate 5/5 (threaded)...
+    Iteration 50, best travel time 1670.5722
+    Iteration 50, best travel time 1598.8065
+    Iteration 50, best travel time 1595.2718
+    Iteration 50, best travel time 1595.7943
+    Iteration 50, best travel time 1614.8607
+    Iteration 100, best travel time 1670.5722
+    Iteration 100, best travel time 1598.8065
+    Iteration 100, best travel time 1595.0778
+    Iteration 100, best travel time 1595.2718
+    Iteration 100, best travel time 1614.1442
+    Iteration 150, best travel time 1595.2718
+    Iteration 150, best travel time 1618.9308
+    Iteration 150, best travel time 1598.8065
+    Iteration 150, best travel time 1589.3954
+    Iteration 200, best travel time 1580.1596
+    Iteration 200, best travel time 1598.8065
+    Iteration 200, best travel time 1618.9308
+    Iteration 150, best travel time 1614.1442
+    Iteration 250, best travel time 1598.8065
+    Iteration 250, best travel time 1580.1596
+    Iteration 200, best travel time 1589.3954
+    Iteration 200, best travel time 1614.1442
+    Iteration 250, best travel time 1610.3386
+    Iteration 300, best travel time 1580.1596
+    Iteration 250, best travel time 1592.4875
+    Iteration 250, best travel time 1589.3954
+    Iteration 350, best travel time 1580.1596
+    Iteration 300, best travel time 1589.3954
+    Iteration 400, best travel time 1580.1596
+    Iteration 300, best travel time 1564.2389
+    Iteration 350, best travel time 1589.3954
+    Iteration 300, best travel time 1566.1631
+    Iteration 350, best travel time 1562.8858
+    Iteration 400, best travel time 1562.8858
+    Iteration 350, best travel time 1551.8405
+    Iteration 450, best travel time 1562.8858
+    Iteration 500, best travel time 1560.7086
+    Iteration 400, best travel time 1551.8405
+    Iteration 550, best travel time 1559.9774
+    Iteration 450, best travel time 1551.8405
+    Iteration 500, best travel time 1551.8405
+    Iteration 600, best travel time 1543.5742
+    Iteration 550, best travel time 1551.8405
+    Iteration 650, best travel time 1532.3422
+    Iteration 700, best travel time 1532.3422
+    Iteration 750, best travel time 1532.3422
+    Iteration 800, best travel time 1532.3422
+    Iteration 850, best travel time 1532.3422
+Run 1 best travel time = 1532.3422 (gap 1.29%)
+
+=== Run 2/10 ===
+Generation 1: Best Fitness = 0.000004072061835891129, Running Best Fitness = 0.000004072061835891129, Entropy = 0.9281231333509757, Lowest Feasible Travel Time = None
+Generation 100: Best Fitness = 0.000007923669094160928, Running Best Fitness = 0.000007923669094160928, Entropy = 0.8375302565286965, Lowest Feasible Travel Time = None
+Generation 200: Best Fitness = 0.00001474846663979976, Running Best Fitness = 0.00001474846663979976, Entropy = 0.8631465901228005, Lowest Feasible Travel Time = None
+Generation 300: Best Fitness = 0.0002256588356320279, Running Best Fitness = 0.0002256588356320279, Entropy = 0.26175424906902717, Lowest Feasible Travel Time = 4430.468403172375
+Generation 400: Best Fitness = 0.0002689589222131256, Running Best Fitness = 0.0002689589222131256, Entropy = 0.15662516829577958, Lowest Feasible Travel Time = 3717.039884200571
+Generation 500: Best Fitness = 0.0003064031478349592, Running Best Fitness = 0.0003064031478349592, Entropy = 0.1379504452782353, Lowest Feasible Travel Time = 3262.674042078182
+Generation 600: Best Fitness = 0.0003366238186745624, Running Best Fitness = 0.0003366238186745624, Entropy = 0.11851785709581404, Lowest Feasible Travel Time = 2969.6751112783536
+Generation 700: Best Fitness = 0.0003759983813371373, Running Best Fitness = 0.0003759983813371373, Entropy = 0.10636291702620454, Lowest Feasible Travel Time = 2658.5859174812626
+Generation 800: Best Fitness = 0.0004364467639572732, Running Best Fitness = 0.0004364467639572732, Entropy = 0.055440270275942484, Lowest Feasible Travel Time = 2290.2301856312924
+Generation 900: Best Fitness = 0.00046821330433242735, Running Best Fitness = 0.00046821330433242735, Entropy = 0.029445440571054672, Lowest Feasible Travel Time = 2134.778694767735
+Generation 1000: Best Fitness = 0.000505531042835272, Running Best Fitness = 0.000505531042835272, Entropy = 0.0032884696112153765, Lowest Feasible Travel Time = 1977.1178904296314
+Generation 1100: Best Fitness = 0.0005255662510318036, Running Best Fitness = 0.0005255662510318036, Entropy = 0.06578651658090164, Lowest Feasible Travel Time = 1901.709692711009
+Generation 1200: Best Fitness = 0.0005355968503707382, Running Best Fitness = 0.0005355968503707382, Entropy = 0.053821560268341506, Lowest Feasible Travel Time = 1866.0759533178802
+Generation 1300: Best Fitness = 0.0005495103052707622, Running Best Fitness = 0.0005495103052707622, Entropy = 0.0026146544090392453, Lowest Feasible Travel Time = 1818.8020863453442
+Generation 1400: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 1500: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 1600: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 1700: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 1800: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 1900: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 2000: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 2100: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 2200: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 2300: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 2400: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 2500: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 2600: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 2700: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 2800: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 2900: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 3000: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 3100: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 3200: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 3300: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+Generation 3400: Best Fitness = 0.0005615234837019, Running Best Fitness = 0.0005615234837019, Entropy = 0, Lowest Feasible Travel Time = 1779.8694186882435
+  Refining candidate 1/5 (threaded)...
+  Refining candidate 2/5 (threaded)...
+  Refining candidate 3/5 (threaded)...
+  Refining candidate 4/5 (threaded)...
+  Refining candidate 5/5 (threaded)...
+    Iteration 50, best travel time 1646.1260
+    Iteration 50, best travel time 1595.5270
+    Iteration 50, best travel time 1636.9590
+    Iteration 50, best travel time 1606.3564
+    Iteration 50, best travel time 1603.3123
+    Iteration 100, best travel time 1636.9590
+    Iteration 100, best travel time 1576.8657
+    Iteration 100, best travel time 1606.3564
+    Iteration 100, best travel time 1595.5270
+    Iteration 100, best travel time 1603.3123
+    Iteration 150, best travel time 1595.5270
+    Iteration 150, best travel time 1576.8657
+    Iteration 150, best travel time 1633.2114
+    Iteration 150, best travel time 1601.7315
+    Iteration 150, best travel time 1603.3123
+    Iteration 200, best travel time 1576.8657
+    Iteration 200, best travel time 1584.9353
+    Iteration 200, best travel time 1603.3123
+    Iteration 200, best travel time 1625.9060
+    Iteration 250, best travel time 1576.8657
+    Iteration 200, best travel time 1601.7315
+    Iteration 300, best travel time 1576.8657
+    Iteration 250, best travel time 1603.3123
+    Iteration 250, best travel time 1584.9353
+    Iteration 250, best travel time 1625.9060
+    Iteration 300, best travel time 1584.9353
+    Iteration 250, best travel time 1587.9062
+    Iteration 300, best travel time 1625.9060
+    Iteration 350, best travel time 1584.9353
+    Iteration 400, best travel time 1584.9353
+    Iteration 350, best travel time 1625.9060
+    Iteration 300, best travel time 1584.6057
+    Iteration 400, best travel time 1625.9060
+    Iteration 350, best travel time 1584.6057
+    Iteration 400, best travel time 1584.6057
+    Iteration 450, best travel time 1584.6057
+    Iteration 500, best travel time 1584.6057
+Run 2 best travel time = 1576.8657 (gap 4.24%)
+
+=== Run 3/10 ===
+Generation 1: Best Fitness = 0.000003331146476405426, Running Best Fitness = 0.000003331146476405426, Entropy = 0.9250428898059373, Lowest Feasible Travel Time = None
+Generation 100: Best Fitness = 0.000008035253571233824, Running Best Fitness = 0.000008035253571233824, Entropy = 0.838746052700975, Lowest Feasible Travel Time = None
+Generation 200: Best Fitness = 0.000024412056745915227, Running Best Fitness = 0.000024412056745915227, Entropy = 0.7350207713583894, Lowest Feasible Travel Time = None
+Generation 300: Best Fitness = 0.00024704158629714883, Running Best Fitness = 0.00024704158629714883, Entropy = 0.2031309684842167, Lowest Feasible Travel Time = 4046.9014686910677
+Generation 400: Best Fitness = 0.0002857221917040098, Running Best Fitness = 0.0002857221917040098, Entropy = 0.056047126041559835, Lowest Feasible Travel Time = 3498.903154305694
+Generation 500: Best Fitness = 0.0003241263180683749, Running Best Fitness = 0.0003241263180683749, Entropy = 0.08674778734710263, Lowest Feasible Travel Time = 3084.21691777293
+Generation 600: Best Fitness = 0.00036230922211460097, Running Best Fitness = 0.00036230922211460097, Entropy = 0.17949925327302552, Lowest Feasible Travel Time = 2759.0732715649533
+Generation 700: Best Fitness = 0.0003885409841892692, Running Best Fitness = 0.0003885409841892692, Entropy = 0.04756496174073566, Lowest Feasible Travel Time = 2572.731062339802
+Generation 800: Best Fitness = 0.00042498820923256693, Running Best Fitness = 0.00042498820923256693, Entropy = 0.1417607027219401, Lowest Feasible Travel Time = 2352.0064558868
+Generation 900: Best Fitness = 0.000464051072798296, Running Best Fitness = 0.000464051072798296, Entropy = 0.02668583678801797, Lowest Feasible Travel Time = 2153.9352185953444
+Generation 1000: Best Fitness = 0.0005070650537424761, Running Best Fitness = 0.0005070650537424761, Entropy = 0.04004029812356743, Lowest Feasible Travel Time = 1971.1335410897227
+Generation 1100: Best Fitness = 0.0005322122939987137, Running Best Fitness = 0.0005322122939987137, Entropy = 0.001877828456378551, Lowest Feasible Travel Time = 1877.9494554637567
+Generation 1200: Best Fitness = 0.0005598901213716029, Running Best Fitness = 0.0005598901213716029, Entropy = 0, Lowest Feasible Travel Time = 1785.0647327554705
+Generation 1300: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 1400: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 1500: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 1600: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 1700: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 1800: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 1900: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 2000: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 2100: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 2200: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 2300: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 2400: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 2500: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 2600: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 2700: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 2800: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 2900: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 3000: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 3100: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 3200: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+Generation 3300: Best Fitness = 0.0005599719065360578, Running Best Fitness = 0.0005599719065360578, Entropy = 0, Lowest Feasible Travel Time = 1784.8038739584658
+  Refining candidate 1/5 (threaded)...
+  Refining candidate 2/5 (threaded)...
+  Refining candidate 3/5 (threaded)...
+  Refining candidate 4/5 (threaded)...
+  Refining candidate 5/5 (threaded)...
+    Iteration 50, best travel time 1635.0831
+    Iteration 50, best travel time 1664.3992
+    Iteration 50, best travel time 1596.3116
+    Iteration 50, best travel time 1583.9950
+    Iteration 50, best travel time 1616.4375
+    Iteration 100, best travel time 1656.9883
+    Iteration 100, best travel time 1559.7120
+    Iteration 100, best travel time 1621.5095
+    Iteration 100, best travel time 1605.5811
+    Iteration 100, best travel time 1580.9916
+    Iteration 150, best travel time 1558.2340
+    Iteration 150, best travel time 1574.7199
+    Iteration 150, best travel time 1624.9466
+    Iteration 150, best travel time 1580.9916
+    Iteration 150, best travel time 1605.5811
+    Iteration 200, best travel time 1549.6384
+    Iteration 200, best travel time 1565.0309
+    Iteration 200, best travel time 1605.5811
+    Iteration 200, best travel time 1613.7624
+    Iteration 200, best travel time 1580.9916
+    Iteration 250, best travel time 1605.5811
+    Iteration 250, best travel time 1549.6384
+    Iteration 300, best travel time 1605.5811
+    Iteration 250, best travel time 1565.0309
+    Iteration 250, best travel time 1580.9916
+    Iteration 250, best travel time 1597.1227
+    Iteration 300, best travel time 1580.9916
+    Iteration 300, best travel time 1549.6384
+    Iteration 300, best travel time 1557.8147
+    Iteration 350, best travel time 1549.6384
+    Iteration 400, best travel time 1549.6384
+    Iteration 300, best travel time 1597.1227
+    Iteration 350, best travel time 1545.2518
+    Iteration 350, best travel time 1597.1227
+    Iteration 400, best travel time 1597.1227
+    Iteration 400, best travel time 1534.9683
+    Iteration 450, best travel time 1597.1227
+    Iteration 450, best travel time 1534.9683
+    Iteration 500, best travel time 1522.3489
+    Iteration 550, best travel time 1521.5689
+    Iteration 600, best travel time 1521.5689
+    Iteration 650, best travel time 1521.5689
+    Iteration 700, best travel time 1521.5689
+    Iteration 750, best travel time 1521.5689
+Run 3 best travel time = 1521.5689 (gap 0.58%)
+
+=== Run 4/10 ===
+Generation 1: Best Fitness = 0.0000031373965886900914, Running Best Fitness = 0.0000031373965886900914, Entropy = 0.9254337771447584, Lowest Feasible Travel Time = None
+Generation 100: Best Fitness = 0.000006282797412105201, Running Best Fitness = 0.000006282797412105201, Entropy = 0.8688116173316035, Lowest Feasible Travel Time = None
+Generation 200: Best Fitness = 0.000022494100749895374, Running Best Fitness = 0.000022494100749895374, Entropy = 0.7793072131860503, Lowest Feasible Travel Time = None
+Generation 300: Best Fitness = 0.00006104957712793155, Running Best Fitness = 0.00006104957712793155, Entropy = 0.4240184219690574, Lowest Feasible Travel Time = None
+Generation 400: Best Fitness = 0.00007123893028154843, Running Best Fitness = 0.00007123893028154843, Entropy = 0.4629662100179877, Lowest Feasible Travel Time = None
+Generation 500: Best Fitness = 0.00029525954879834675, Running Best Fitness = 0.00029525954879834675, Entropy = 0.12165263378059893, Lowest Feasible Travel Time = 3385.8506677254645
+Generation 600: Best Fitness = 0.00034065515102985804, Running Best Fitness = 0.00034065515102985804, Entropy = 0.07417234951740204, Lowest Feasible Travel Time = 2934.519973723665
+Generation 700: Best Fitness = 0.0003759584787559419, Running Best Fitness = 0.0003759584787559419, Entropy = 0.1494062635992372, Lowest Feasible Travel Time = 2658.8681942458925
+Generation 800: Best Fitness = 0.00041765940114573167, Running Best Fitness = 0.00041765940114573167, Entropy = 0.03935907700501501, Lowest Feasible Travel Time = 2393.295440870671
+Generation 900: Best Fitness = 0.00045757196090337335, Running Best Fitness = 0.00045757196090337335, Entropy = 0.12619248531661242, Lowest Feasible Travel Time = 2184.4485970375545
+Generation 1000: Best Fitness = 0.0005006241657688986, Running Best Fitness = 0.0005006241657688986, Entropy = 0.0005188770459896558, Lowest Feasible Travel Time = 1996.506449701884
+Generation 1100: Best Fitness = 0.0005346189927114221, Running Best Fitness = 0.0005346189927114221, Entropy = 0.008015154163591179, Lowest Feasible Travel Time = 1869.4909732598712
+Generation 1200: Best Fitness = 0.0005648943568648356, Running Best Fitness = 0.0005648943568648356, Entropy = 0.03184694142854456, Lowest Feasible Travel Time = 1769.2425025981872
+Generation 1300: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 1400: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 1500: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 1600: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 1700: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 1800: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 1900: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 2000: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 2100: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 2200: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 2300: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 2400: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 2500: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 2600: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 2700: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 2800: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 2900: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 3000: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 3100: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 3200: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+Generation 3300: Best Fitness = 0.0005809371179292972, Running Best Fitness = 0.0005809371179292972, Entropy = 0, Lowest Feasible Travel Time = 1720.3566996104812
+  Refining candidate 1/5 (threaded)...
+  Refining candidate 2/5 (threaded)...
+  Refining candidate 3/5 (threaded)...
+  Refining candidate 4/5 (threaded)...
+  Refining candidate 5/5 (threaded)...
+    Iteration 50, best travel time 1634.2052
+    Iteration 50, best travel time 1673.1770
+    Iteration 50, best travel time 1594.7103
+    Iteration 50, best travel time 1646.5290
+    Iteration 50, best travel time 1618.3144
+    Iteration 100, best travel time 1634.2052
+    Iteration 100, best travel time 1673.1770
+    Iteration 150, best travel time 1634.2052
+    Iteration 100, best travel time 1618.3144
+    Iteration 100, best travel time 1573.4966
+    Iteration 100, best travel time 1624.0034
+    Iteration 150, best travel time 1673.1770
+    Iteration 200, best travel time 1634.2052
+    Iteration 200, best travel time 1673.1770
+    Iteration 250, best travel time 1634.2052
+    Iteration 250, best travel time 1673.1770
+    Iteration 150, best travel time 1591.5528
+    Iteration 150, best travel time 1573.4966
+    Iteration 150, best travel time 1624.0034
+    Iteration 200, best travel time 1573.4966
+    Iteration 200, best travel time 1586.2890
+    Iteration 200, best travel time 1624.0034
+    Iteration 250, best travel time 1573.4966
+    Iteration 300, best travel time 1573.4966
+    Iteration 250, best travel time 1586.2890
+    Iteration 250, best travel time 1624.0034
+    Iteration 300, best travel time 1624.0034
+    Iteration 300, best travel time 1586.2890
+    Iteration 350, best travel time 1586.2890
+    Iteration 400, best travel time 1586.2890
+Run 4 best travel time = 1573.4966 (gap 4.01%)
+
+=== Run 5/10 ===
+Generation 1: Best Fitness = 0.000003102383553616695, Running Best Fitness = 0.000003102383553616695, Entropy = 0.9281540480620974, Lowest Feasible Travel Time = None
+Generation 100: Best Fitness = 0.000006947711347863218, Running Best Fitness = 0.000006947711347863218, Entropy = 0.891813630530028, Lowest Feasible Travel Time = None
+Generation 200: Best Fitness = 0.000027819774562412465, Running Best Fitness = 0.000027819774562412465, Entropy = 0.7254421825121251, Lowest Feasible Travel Time = None
+Generation 300: Best Fitness = 0.0002610943241561243, Running Best Fitness = 0.0002610943241561243, Entropy = 0.20262407535295332, Lowest Feasible Travel Time = 3829.033468678693
+Generation 400: Best Fitness = 0.00029649648445485193, Running Best Fitness = 0.00029649648445485193, Entropy = 0.16304305959169418, Lowest Feasible Travel Time = 3371.721271345367
+Generation 500: Best Fitness = 0.00033031604353040783, Running Best Fitness = 0.00033031604353040783, Entropy = 0.1504823734475024, Lowest Feasible Travel Time = 3026.4036626015204
+Generation 600: Best Fitness = 0.0003736657515335412, Running Best Fitness = 0.0003736657515335412, Entropy = 0.13079584616738787, Lowest Feasible Travel Time = 2675.1885345283977
+Generation 700: Best Fitness = 0.000413201345493441, Running Best Fitness = 0.000413201345493441, Entropy = 0.06946215199983491, Lowest Feasible Travel Time = 2419.1276469848126
+Generation 800: Best Fitness = 0.00046308668391775476, Running Best Fitness = 0.00046308668391775476, Entropy = 0.13363509810877802, Lowest Feasible Travel Time = 2158.4229217301404
+Generation 900: Best Fitness = 0.0004983375955482759, Running Best Fitness = 0.0004983375955482759, Entropy = 0.09212215454824385, Lowest Feasible Travel Time = 2005.671800267829
+Generation 1000: Best Fitness = 0.0005569081729019485, Running Best Fitness = 0.0005569081729019485, Entropy = 0.05449131517523501, Lowest Feasible Travel Time = 1794.6281639559709
+Generation 1100: Best Fitness = 0.0005896106651193319, Running Best Fitness = 0.0005896106651193319, Entropy = 0.08013963874284477, Lowest Feasible Travel Time = 1695.0344497798544
+Generation 1200: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 1300: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 1400: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 1500: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 1600: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 1700: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 1800: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 1900: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 2000: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 2100: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 2200: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 2300: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 2400: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 2500: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 2600: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 2700: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 2800: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 2900: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 3000: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 3100: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+Generation 3200: Best Fitness = 0.000590390364872224, Running Best Fitness = 0.000590390364872224, Entropy = 0, Lowest Feasible Travel Time = 1692.7945798224982
+  Refining candidate 1/5 (threaded)...
+  Refining candidate 2/5 (threaded)...
+  Refining candidate 3/5 (threaded)...
+  Refining candidate 4/5 (threaded)...
+  Refining candidate 5/5 (threaded)...
+    Iteration 50, best travel time 1665.3676
+    Iteration 50, best travel time 1691.8958
+    Iteration 50, best travel time 1598.3143
+    Iteration 50, best travel time 1658.1189
+    Iteration 50, best travel time 1573.7786
+    Iteration 100, best travel time 1631.1686
+    Iteration 100, best travel time 1598.3143
+    Iteration 100, best travel time 1610.5058
+    Iteration 100, best travel time 1600.8669
+    Iteration 100, best travel time 1569.5132
+    Iteration 150, best travel time 1583.7522
+    Iteration 150, best travel time 1603.5931
+    Iteration 150, best travel time 1586.6175
+    Iteration 150, best travel time 1600.8669
+    Iteration 150, best travel time 1569.5132
+    Iteration 200, best travel time 1574.1595
+    Iteration 200, best travel time 1603.5931
+    Iteration 200, best travel time 1586.6175
+    Iteration 200, best travel time 1600.8669
+    Iteration 200, best travel time 1569.5132
+    Iteration 250, best travel time 1572.3086
+    Iteration 250, best travel time 1586.6175
+    Iteration 250, best travel time 1569.5132
+    Iteration 250, best travel time 1580.5727
+    Iteration 250, best travel time 1597.4780
+    Iteration 300, best travel time 1583.6518
+    Iteration 300, best travel time 1569.5132
+    Iteration 300, best travel time 1571.7647
+    Iteration 300, best travel time 1580.5727
+    Iteration 300, best travel time 1596.1903
+    Iteration 350, best travel time 1571.7647
+    Iteration 350, best travel time 1551.9320
+    Iteration 350, best travel time 1580.5727
+    Iteration 350, best travel time 1596.1903
+    Iteration 400, best travel time 1571.7647
+    Iteration 400, best travel time 1548.9661
+    Iteration 450, best travel time 1571.7647
+    Iteration 400, best travel time 1576.1112
+    Iteration 400, best travel time 1596.1903
+    Iteration 500, best travel time 1571.7647
+    Iteration 450, best travel time 1545.8491
+    Iteration 450, best travel time 1575.8557
+    Iteration 450, best travel time 1571.6260
+    Iteration 500, best travel time 1545.8491
+    Iteration 500, best travel time 1575.8557
+    Iteration 550, best travel time 1545.8491
+    Iteration 500, best travel time 1571.2856
+    Iteration 600, best travel time 1545.8491
+    Iteration 650, best travel time 1545.8491
+    Iteration 550, best travel time 1574.8675
+    Iteration 550, best travel time 1571.2856
+    Iteration 600, best travel time 1571.2856
+    Iteration 600, best travel time 1572.8874
+    Iteration 650, best travel time 1571.2856
+    Iteration 700, best travel time 1571.2856
+    Iteration 650, best travel time 1548.7907
+    Iteration 700, best travel time 1548.7907
+    Iteration 750, best travel time 1548.7907
+    Iteration 800, best travel time 1548.7907
+    Iteration 850, best travel time 1548.7907
+Run 5 best travel time = 1545.8491 (gap 2.19%)
+
+=== Run 6/10 ===
+Generation 1: Best Fitness = 0.0000032003636368078167, Running Best Fitness = 0.0000032003636368078167, Entropy = 0.9323580480227476, Lowest Feasible Travel Time = None
+Generation 100: Best Fitness = 0.000012085286800528351, Running Best Fitness = 0.000012085286800528351, Entropy = 0.8315620669803288, Lowest Feasible Travel Time = None
+Generation 200: Best Fitness = 0.00001921310413072407, Running Best Fitness = 0.00001921310413072407, Entropy = 0.7705799334118086, Lowest Feasible Travel Time = None
+Generation 300: Best Fitness = 0.00006831175819675007, Running Best Fitness = 0.00006831175819675007, Entropy = 0.46337542184396124, Lowest Feasible Travel Time = None
+Generation 400: Best Fitness = 0.00026408174221109005, Running Best Fitness = 0.00026408174221109005, Entropy = 0.10566165779567069, Lowest Feasible Travel Time = 3785.706311565697
+Generation 500: Best Fitness = 0.000312290914258122, Running Best Fitness = 0.000312290914258122, Entropy = 0.08645807480074477, Lowest Feasible Travel Time = 3201.1424714695877
+Generation 600: Best Fitness = 0.00035121947681578466, Running Best Fitness = 0.00035121947681578466, Entropy = 0.19796696426507765, Lowest Feasible Travel Time = 2846.2225090310185
+Generation 700: Best Fitness = 0.0003974201389912665, Running Best Fitness = 0.0003974201389912665, Entropy = 0.013474995652397482, Lowest Feasible Travel Time = 2515.2288014346836
+Generation 800: Best Fitness = 0.0004252755201422047, Running Best Fitness = 0.0004252755201422047, Entropy = 0.10988725811545785, Lowest Feasible Travel Time = 2350.4167936720587
+Generation 900: Best Fitness = 0.0004599649065568802, Running Best Fitness = 0.0004599649065568802, Entropy = 0.003499189131306303, Lowest Feasible Travel Time = 2173.0789041616545
+Generation 1000: Best Fitness = 0.000494288438842173, Running Best Fitness = 0.000494288438842173, Entropy = 0.00839013367519251, Lowest Feasible Travel Time = 2022.110235680227
+Generation 1100: Best Fitness = 0.0005250472216450412, Running Best Fitness = 0.0005250472216450412, Entropy = 0.07267474169973706, Lowest Feasible Travel Time = 1903.5905944742835
+Generation 1200: Best Fitness = 0.0005620253976081582, Running Best Fitness = 0.0005620253976081582, Entropy = 0.005595403603063557, Lowest Feasible Travel Time = 1778.279022364032
+Generation 1300: Best Fitness = 0.0005716817942912987, Running Best Fitness = 0.0005716817942912987, Entropy = 0.14720631303742762, Lowest Feasible Travel Time = 1748.2248484835482
+Generation 1400: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 1500: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 1600: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 1700: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 1800: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 1900: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 2000: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 2100: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 2200: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 2300: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 2400: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 2500: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 2600: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 2700: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 2800: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 2900: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 3000: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 3100: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 3200: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 3300: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+Generation 3400: Best Fitness = 0.0005789675870454283, Running Best Fitness = 0.0005789675870454283, Entropy = 0, Lowest Feasible Travel Time = 1726.2124076982839
+  Refining candidate 1/5 (threaded)...
+  Refining candidate 2/5 (threaded)...
+  Refining candidate 3/5 (threaded)...
+  Refining candidate 4/5 (threaded)...
+  Refining candidate 5/5 (threaded)...
+    Iteration 50, best travel time 1596.1004
+    Iteration 50, best travel time 1614.0872
+    Iteration 50, best travel time 1601.2609
+    Iteration 50, best travel time 1583.0031
+    Iteration 50, best travel time 1604.2455
+    Iteration 100, best travel time 1596.1004
+    Iteration 100, best travel time 1601.2609
+    Iteration 100, best travel time 1583.0031
+    Iteration 150, best travel time 1596.1004
+    Iteration 100, best travel time 1604.2455
+    Iteration 100, best travel time 1588.7119
+    Iteration 200, best travel time 1596.1004
+    Iteration 150, best travel time 1598.6974
+    Iteration 250, best travel time 1596.1004
+    Iteration 150, best travel time 1557.3282
+    Iteration 150, best travel time 1604.2455
+    Iteration 150, best travel time 1561.6940
+    Iteration 200, best travel time 1583.9292
+    Iteration 200, best travel time 1604.2455
+    Iteration 200, best travel time 1553.5142
+    Iteration 250, best travel time 1604.2455
+    Iteration 200, best travel time 1558.2863
+    Iteration 250, best travel time 1581.0385
+    Iteration 250, best travel time 1552.1014
+    Iteration 250, best travel time 1555.5453
+    Iteration 300, best travel time 1570.2693
+    Iteration 300, best travel time 1552.1014
+    Iteration 350, best travel time 1552.1014
+    Iteration 350, best travel time 1570.2655
+    Iteration 400, best travel time 1552.1014
+    Iteration 300, best travel time 1548.3894
+    Iteration 450, best travel time 1552.1014
+    Iteration 350, best travel time 1548.3894
+    Iteration 400, best travel time 1549.5146
+    Iteration 400, best travel time 1548.3894
+    Iteration 450, best travel time 1549.5146
+    Iteration 500, best travel time 1549.5146
+    Iteration 450, best travel time 1548.3894
+    Iteration 550, best travel time 1549.5146
+    Iteration 500, best travel time 1548.3894
+    Iteration 600, best travel time 1549.5146
+Run 6 best travel time = 1548.3894 (gap 2.36%)
+
+=== Run 7/10 ===
+Generation 1: Best Fitness = 0.0000032538542210338463, Running Best Fitness = 0.0000032538542210338463, Entropy = 0.9314863599683633, Lowest Feasible Travel Time = None
+Generation 100: Best Fitness = 0.000007195135512308761, Running Best Fitness = 0.000007195135512308761, Entropy = 0.8641202018696167, Lowest Feasible Travel Time = None
+Generation 200: Best Fitness = 0.000010697779002113193, Running Best Fitness = 0.000010697779002113193, Entropy = 0.859846112347856, Lowest Feasible Travel Time = None
+Generation 300: Best Fitness = 0.000066564665439827, Running Best Fitness = 0.000066564665439827, Entropy = 0.5365973047180815, Lowest Feasible Travel Time = None
+Generation 400: Best Fitness = 0.00026595993854873614, Running Best Fitness = 0.00026595993854873614, Entropy = 0.17804239773381075, Lowest Feasible Travel Time = 3758.964773103427
+Generation 500: Best Fitness = 0.00029845299641150717, Running Best Fitness = 0.00029845299641150717, Entropy = 0.08129798455594597, Lowest Feasible Travel Time = 3349.6113593217187
+Generation 600: Best Fitness = 0.00034483784303595373, Running Best Fitness = 0.00034483784303595373, Entropy = 0.16646108369465257, Lowest Feasible Travel Time = 2898.9137426333377
+Generation 700: Best Fitness = 0.00039234092470880126, Running Best Fitness = 0.00039234092470880126, Entropy = 0.13461626694788698, Lowest Feasible Travel Time = 2547.803698574673
+Generation 800: Best Fitness = 0.0004309132323276302, Running Best Fitness = 0.0004309132323276302, Entropy = 0.14357708118637771, Lowest Feasible Travel Time = 2319.6528019536054
+Generation 900: Best Fitness = 0.0004934355308699681, Running Best Fitness = 0.0004934355308699681, Entropy = 0.0639380742694331, Lowest Feasible Travel Time = 2025.6072008169265
+Generation 1000: Best Fitness = 0.0005207550137996136, Running Best Fitness = 0.0005207550137996136, Entropy = 0.0036344655790292797, Lowest Feasible Travel Time = 1919.2887605510407
+Generation 1100: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 1200: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 1300: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 1400: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 1500: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 1600: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 1700: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 1800: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 1900: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 2000: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 2100: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 2200: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 2300: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 2400: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 2500: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 2600: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 2700: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 2800: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 2900: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 3000: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+Generation 3100: Best Fitness = 0.000539071821314991, Running Best Fitness = 0.000539071821314991, Entropy = 0, Lowest Feasible Travel Time = 1854.0403869388658
+  Refining candidate 1/5 (threaded)...
+  Refining candidate 2/5 (threaded)...
+  Refining candidate 3/5 (threaded)...
+  Refining candidate 4/5 (threaded)...
+  Refining candidate 5/5 (threaded)...
+    Iteration 50, best travel time 1709.7812
+    Iteration 50, best travel time 1574.3932
+    Iteration 50, best travel time 1697.7374
+    Iteration 50, best travel time 1615.5738
+    Iteration 50, best travel time 1624.5809
+    Iteration 100, best travel time 1668.6341
+    Iteration 100, best travel time 1560.5840
+    Iteration 100, best travel time 1640.4874
+    Iteration 100, best travel time 1624.5809
+    Iteration 100, best travel time 1595.8979
+    Iteration 150, best travel time 1560.5840
+    Iteration 150, best travel time 1624.5809
+    Iteration 150, best travel time 1603.7624
+    Iteration 150, best travel time 1605.8284
+    Iteration 200, best travel time 1624.5809
+    Iteration 200, best travel time 1560.5840
+    Iteration 150, best travel time 1587.8049
+    Iteration 250, best travel time 1624.5809
+    Iteration 250, best travel time 1560.5840
+    Iteration 200, best travel time 1605.8284
+    Iteration 200, best travel time 1563.7804
+    Iteration 300, best travel time 1560.5840
+    Iteration 200, best travel time 1587.8049
+    Iteration 250, best travel time 1605.8284
+    Iteration 250, best travel time 1560.6567
+    Iteration 300, best travel time 1605.8284
+    Iteration 350, best travel time 1605.8284
+    Iteration 250, best travel time 1587.8049
+    Iteration 300, best travel time 1560.6567
+    Iteration 300, best travel time 1583.9660
+    Iteration 350, best travel time 1551.7295
+    Iteration 350, best travel time 1580.2949
+    Iteration 400, best travel time 1551.7295
+    Iteration 450, best travel time 1551.7295
+    Iteration 400, best travel time 1571.4334
+    Iteration 500, best travel time 1549.2369
+    Iteration 450, best travel time 1571.4334
+    Iteration 500, best travel time 1564.6026
+    Iteration 550, best travel time 1549.2369
+    Iteration 550, best travel time 1564.6026
+    Iteration 600, best travel time 1549.2369
+    Iteration 600, best travel time 1564.6026
+    Iteration 650, best travel time 1549.2369
+    Iteration 650, best travel time 1564.6026
+    Iteration 700, best travel time 1549.2369
+    Iteration 700, best travel time 1564.6026
+Run 7 best travel time = 1549.2369 (gap 2.41%)
+
+=== Run 8/10 ===
+Generation 1: Best Fitness = 0.000003782619619803215, Running Best Fitness = 0.000003782619619803215, Entropy = 0.9264717737663428, Lowest Feasible Travel Time = None
+Generation 100: Best Fitness = 0.000007011125630507662, Running Best Fitness = 0.000007011125630507662, Entropy = 0.8224157393201849, Lowest Feasible Travel Time = None
+Generation 200: Best Fitness = 0.000011860843103679937, Running Best Fitness = 0.000011860843103679937, Entropy = 0.8124584713730285, Lowest Feasible Travel Time = None
+Generation 300: Best Fitness = 0.00005335936607004534, Running Best Fitness = 0.00005335936607004534, Entropy = 0.5337932873304087, Lowest Feasible Travel Time = None
+Generation 400: Best Fitness = 0.0002614531830897876, Running Best Fitness = 0.0002614531830897876, Entropy = 0.36084472903317844, Lowest Feasible Travel Time = 3823.776536212919
+Generation 500: Best Fitness = 0.00030565976132198355, Running Best Fitness = 0.00030565976132198355, Entropy = 0.09047077055246526, Lowest Feasible Travel Time = 3270.6115319693486
+Generation 600: Best Fitness = 0.00034672172441219123, Running Best Fitness = 0.00034672172441219123, Entropy = 0.15208556285252778, Lowest Feasible Travel Time = 2883.1573215388594
+Generation 700: Best Fitness = 0.0003846009576317335, Running Best Fitness = 0.0003846009576317335, Entropy = 0.06370110971284684, Lowest Feasible Travel Time = 2599.0975300678497
+Generation 800: Best Fitness = 0.00043938774873305896, Running Best Fitness = 0.00043938774873305896, Entropy = 0.05191265881939981, Lowest Feasible Travel Time = 2274.8941342434414
+Generation 900: Best Fitness = 0.0004713463802099473, Running Best Fitness = 0.0004713463802099473, Entropy = 0.12587920166727162, Lowest Feasible Travel Time = 2120.5820084469083
+Generation 1000: Best Fitness = 0.0005333235057615302, Running Best Fitness = 0.0005333235057615302, Entropy = 0.08818173300901141, Lowest Feasible Travel Time = 1874.0345506937754
+Generation 1100: Best Fitness = 0.0005592975910334187, Running Best Fitness = 0.0005592975910334187, Entropy = 0.04493052550504229, Lowest Feasible Travel Time = 1786.9569231690987
+Generation 1200: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 1300: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 1400: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 1500: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 1600: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 1700: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 1800: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 1900: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 2000: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 2100: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 2200: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 2300: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 2400: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 2500: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 2600: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 2700: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 2800: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 2900: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 3000: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 3100: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+Generation 3200: Best Fitness = 0.0005664928793008882, Running Best Fitness = 0.0005664928793008882, Entropy = 0, Lowest Feasible Travel Time = 1764.2472547123718
+  Refining candidate 1/5 (threaded)...
+  Refining candidate 2/5 (threaded)...
+  Refining candidate 3/5 (threaded)...
+  Refining candidate 4/5 (threaded)...
+  Refining candidate 5/5 (threaded)...
+    Iteration 50, best travel time 1598.5024
+    Iteration 50, best travel time 1625.3335
+    Iteration 50, best travel time 1596.0152
+    Iteration 50, best travel time 1590.2525
+    Iteration 50, best travel time 1586.1874
+    Iteration 100, best travel time 1598.5024
+    Iteration 100, best travel time 1595.9069
+    Iteration 100, best travel time 1596.0152
+    Iteration 100, best travel time 1590.2525
+    Iteration 100, best travel time 1579.5277
+    Iteration 150, best travel time 1590.2525
+    Iteration 150, best travel time 1581.0681
+    Iteration 150, best travel time 1581.8925
+    Iteration 150, best travel time 1596.0152
+    Iteration 150, best travel time 1569.6093
+    Iteration 200, best travel time 1590.2525
+    Iteration 250, best travel time 1590.2525
+    Iteration 200, best travel time 1595.9490
+    Iteration 200, best travel time 1581.0681
+    Iteration 200, best travel time 1581.8925
+    Iteration 200, best travel time 1562.8383
+    Iteration 250, best travel time 1580.6925
+    Iteration 250, best travel time 1581.8925
+    Iteration 250, best travel time 1564.7782
+    Iteration 250, best travel time 1558.4680
+    Iteration 300, best travel time 1581.8925
+    Iteration 300, best travel time 1575.1876
+    Iteration 350, best travel time 1581.8925
+    Iteration 300, best travel time 1558.3148
+    Iteration 300, best travel time 1555.5411
+    Iteration 350, best travel time 1568.5201
+    Iteration 350, best travel time 1549.7042
+    Iteration 400, best travel time 1566.6151
+    Iteration 350, best travel time 1553.0200
+    Iteration 400, best travel time 1549.7042
+    Iteration 450, best travel time 1551.9761
+    Iteration 400, best travel time 1553.0200
+    Iteration 450, best travel time 1549.7042
+    Iteration 500, best travel time 1549.7042
+    Iteration 450, best travel time 1553.0200
+    Iteration 500, best travel time 1547.2573
+    Iteration 550, best travel time 1549.7042
+    Iteration 500, best travel time 1553.0200
+    Iteration 550, best travel time 1553.0200
+    Iteration 550, best travel time 1547.2573
+    Iteration 600, best travel time 1547.2573
+    Iteration 650, best travel time 1547.2573
+    Iteration 700, best travel time 1547.2573
+Run 8 best travel time = 1547.2573 (gap 2.28%)
+
+=== Run 9/10 ===
+Generation 1: Best Fitness = 0.000004418217385930799, Running Best Fitness = 0.000004418217385930799, Entropy = 0.9319453563144501, Lowest Feasible Travel Time = None
+Generation 100: Best Fitness = 0.000005566700480436558, Running Best Fitness = 0.000005566700480436558, Entropy = 0.8433935033323695, Lowest Feasible Travel Time = None
+Generation 200: Best Fitness = 0.00001354757034998185, Running Best Fitness = 0.00001354757034998185, Entropy = 0.7096230634413188, Lowest Feasible Travel Time = None
+Generation 300: Best Fitness = 0.00005204018175901516, Running Best Fitness = 0.00005204018175901516, Entropy = 0.639001693392762, Lowest Feasible Travel Time = None
+Generation 400: Best Fitness = 0.0002449461589233141, Running Best Fitness = 0.0002449461589233141, Entropy = 0.2636865719730538, Lowest Feasible Travel Time = 4081.529827761343
+Generation 500: Best Fitness = 0.0002877717432702536, Running Best Fitness = 0.0002877717432702536, Entropy = 0.03994288725009553, Lowest Feasible Travel Time = 3473.976342833199
+Generation 600: Best Fitness = 0.0003204293036325549, Running Best Fitness = 0.0003204293036325549, Entropy = 0.007732035720134089, Lowest Feasible Travel Time = 3119.8131986165895
+Generation 700: Best Fitness = 0.00038124625816267403, Running Best Fitness = 0.00038124625816267403, Entropy = 0.11043059626443978, Lowest Feasible Travel Time = 2621.9765632829103
+Generation 800: Best Fitness = 0.00041269744503166236, Running Best Fitness = 0.00041269744503166236, Entropy = 0.08180973209882861, Lowest Feasible Travel Time = 2422.0826045537538
+Generation 900: Best Fitness = 0.00046360522508255716, Running Best Fitness = 0.00046360522508255716, Entropy = 0.12473736668251502, Lowest Feasible Travel Time = 2156.007613151736
+Generation 1000: Best Fitness = 0.0005102101427790631, Running Best Fitness = 0.0005102101427790631, Entropy = 0.06012870879227861, Lowest Feasible Travel Time = 1958.9767157765643
+Generation 1100: Best Fitness = 0.0005521426642381939, Running Best Fitness = 0.0005521426642381939, Entropy = 0.053983317463845264, Lowest Feasible Travel Time = 1810.1261178842735
+Generation 1200: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 1300: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 1400: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 1500: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 1600: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 1700: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 1800: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 1900: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 2000: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 2100: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 2200: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 2300: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 2400: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 2500: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 2600: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 2700: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 2800: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 2900: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 3000: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 3100: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+Generation 3200: Best Fitness = 0.000562561724792573, Running Best Fitness = 0.000562561724792573, Entropy = 0, Lowest Feasible Travel Time = 1776.5827183563167
+  Refining candidate 1/5 (threaded)...
+  Refining candidate 2/5 (threaded)...
+  Refining candidate 3/5 (threaded)...
+  Refining candidate 4/5 (threaded)...
+  Refining candidate 5/5 (threaded)...
+    Iteration 50, best travel time 1621.5972
+    Iteration 50, best travel time 1658.5204
+    Iteration 50, best travel time 1582.4241
+    Iteration 50, best travel time 1603.1816
+    Iteration 50, best travel time 1603.4173
+    Iteration 100, best travel time 1615.1413
+    Iteration 100, best travel time 1620.9174
+    Iteration 100, best travel time 1582.4241
+    Iteration 100, best travel time 1603.1816
+    Iteration 100, best travel time 1603.4173
+    Iteration 150, best travel time 1615.1413
+    Iteration 150, best travel time 1611.5801
+    Iteration 200, best travel time 1615.1413
+    Iteration 150, best travel time 1603.1816
+    Iteration 150, best travel time 1603.4173
+    Iteration 150, best travel time 1581.5381
+    Iteration 250, best travel time 1615.1413
+    Iteration 200, best travel time 1603.4173
+    Iteration 200, best travel time 1603.1816
+    Iteration 250, best travel time 1603.4173
+    Iteration 250, best travel time 1603.1816
+    Iteration 300, best travel time 1610.6432
+    Iteration 200, best travel time 1611.5801
+    Iteration 200, best travel time 1581.5381
+    Iteration 250, best travel time 1581.5381
+    Iteration 350, best travel time 1597.8008
+    Iteration 250, best travel time 1611.5801
+    Iteration 300, best travel time 1581.5381
+    Iteration 350, best travel time 1581.5381
+    Iteration 400, best travel time 1583.6069
+    Iteration 300, best travel time 1611.5801
+    Iteration 350, best travel time 1611.5801
+    Iteration 450, best travel time 1582.8890
+    Iteration 500, best travel time 1582.8890
+    Iteration 550, best travel time 1582.8890
+    Iteration 600, best travel time 1582.8890
+    Iteration 650, best travel time 1582.8890
+Run 9 best travel time = 1581.5381 (gap 4.55%)
+
+=== Run 10/10 ===
+Generation 1: Best Fitness = 0.000004044146241481951, Running Best Fitness = 0.000004044146241481951, Entropy = 0.9309743157196928, Lowest Feasible Travel Time = None
+Generation 100: Best Fitness = 0.000006773513245909577, Running Best Fitness = 0.000006773513245909577, Entropy = 0.8614398619340066, Lowest Feasible Travel Time = None
+Generation 200: Best Fitness = 0.00001647219179249053, Running Best Fitness = 0.00001647219179249053, Entropy = 0.8018231337060516, Lowest Feasible Travel Time = None
+Generation 300: Best Fitness = 0.000056304004001339084, Running Best Fitness = 0.000056304004001339084, Entropy = 0.5042475604932244, Lowest Feasible Travel Time = None
+Generation 400: Best Fitness = 0.00006999601292212245, Running Best Fitness = 0.00006999601292212245, Entropy = 0.4487254503665503, Lowest Feasible Travel Time = None
+Generation 500: Best Fitness = 0.00027990327417623176, Running Best Fitness = 0.00027990327417623176, Entropy = 0.058164984992977384, Lowest Feasible Travel Time = 3571.6627455253824
+Generation 600: Best Fitness = 0.0003115574057706236, Running Best Fitness = 0.0003115574057706236, Entropy = 0.15180496996835388, Lowest Feasible Travel Time = 3208.681366830436
+Generation 700: Best Fitness = 0.000351718055530734, Running Best Fitness = 0.000351718055530734, Entropy = 0.11500702181592523, Lowest Feasible Travel Time = 2842.1864224059364
+Generation 800: Best Fitness = 0.00039200762865394036, Running Best Fitness = 0.00039200762865394036, Entropy = 0.07820622551240146, Lowest Feasible Travel Time = 2549.9707640990528
+Generation 900: Best Fitness = 0.0004464318989526744, Running Best Fitness = 0.0004464318989526744, Entropy = 0.1191262921210082, Lowest Feasible Travel Time = 2238.9833039395076
+Generation 1000: Best Fitness = 0.0004805287158934722, Running Best Fitness = 0.0004805287158934722, Entropy = 0.09442219413369403, Lowest Feasible Travel Time = 2080.0410843827462
+Generation 1100: Best Fitness = 0.0005185430388727844, Running Best Fitness = 0.0005185430388727844, Entropy = 0.0023904839423376247, Lowest Feasible Travel Time = 1927.4802321786308
+Generation 1200: Best Fitness = 0.0005516643457748645, Running Best Fitness = 0.0005516643457748645, Entropy = 0.001529153930688959, Lowest Feasible Travel Time = 1811.696447865243
+Generation 1300: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0.0012638880058667228, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 1400: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 1500: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 1600: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 1700: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 1800: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 1900: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 2000: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 2100: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 2200: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 2300: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 2400: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 2500: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 2600: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 2700: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 2800: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 2900: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 3000: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 3100: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 3200: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+Generation 3300: Best Fitness = 0.0005706344857295858, Running Best Fitness = 0.0005706344857295858, Entropy = 0, Lowest Feasible Travel Time = 1751.4352716282967
+  Refining candidate 1/5 (threaded)...
+  Refining candidate 2/5 (threaded)...
+  Refining candidate 3/5 (threaded)...
+  Refining candidate 4/5 (threaded)...
+  Refining candidate 5/5 (threaded)...
+    Iteration 50, best travel time 1620.6446
+    Iteration 50, best travel time 1618.8960
+    Iteration 50, best travel time 1609.4453
+    Iteration 50, best travel time 1563.2860
+    Iteration 50, best travel time 1606.2949
+    Iteration 100, best travel time 1607.9905
+    Iteration 100, best travel time 1563.2860
+    Iteration 100, best travel time 1613.7675
+    Iteration 100, best travel time 1606.2949
+    Iteration 100, best travel time 1584.6335
+    Iteration 150, best travel time 1563.2860
+    Iteration 150, best travel time 1584.6335
+    Iteration 150, best travel time 1598.7455
+    Iteration 200, best travel time 1563.2860
+    Iteration 150, best travel time 1597.3814
+    Iteration 150, best travel time 1597.0474
+    Iteration 200, best travel time 1584.6335
+    Iteration 250, best travel time 1563.2860
+    Iteration 250, best travel time 1584.6335
+    Iteration 200, best travel time 1581.6808
+    Iteration 300, best travel time 1584.6335
+    Iteration 200, best travel time 1597.0474
+    Iteration 200, best travel time 1597.3814
+    Iteration 250, best travel time 1581.6808
+    Iteration 250, best travel time 1597.0474
+    Iteration 300, best travel time 1597.0474
+    Iteration 250, best travel time 1577.0093
+    Iteration 350, best travel time 1597.0474
+    Iteration 300, best travel time 1573.4175
+    Iteration 300, best travel time 1564.5002
+    Iteration 350, best travel time 1573.4175
+    Iteration 350, best travel time 1564.3002
+    Iteration 400, best travel time 1572.7138
+    Iteration 400, best travel time 1562.6878
+    Iteration 450, best travel time 1562.6878
+    Iteration 450, best travel time 1570.4071
+    Iteration 500, best travel time 1562.6878
+    Iteration 500, best travel time 1570.4071
+    Iteration 550, best travel time 1562.6878
+    Iteration 550, best travel time 1561.8741
+    Iteration 600, best travel time 1562.6878
+    Iteration 650, best travel time 1559.5230
+    Iteration 600, best travel time 1561.1500
+    Iteration 650, best travel time 1561.1500
+    Iteration 700, best travel time 1548.0067
+    Iteration 700, best travel time 1561.1500
+    Iteration 750, best travel time 1546.2941
+    Iteration 750, best travel time 1561.1500
+    Iteration 800, best travel time 1561.1500
+    Iteration 800, best travel time 1546.2941
+    Iteration 850, best travel time 1546.2941
+    Iteration 900, best travel time 1546.2941
+    Iteration 950, best travel time 1546.2941
+Run 10 best travel time = 1546.2941 (gap 2.22%)
+Saved combined refinement plot: refinement_best_candidate_by_run.png
+Average travel time across 10 successful runs: 1552.28
+
+=== Final Solution ===
+Instance: test_instance_1
+Nurse capacity: 205
+Depot return time: 1204
+
+----------------------
+Nurse: 1 Route duration: 88.98538146727844 Covered demand: 124 Patient sequence: P12 (236.0 - 309.0) [236 - 354] -> P6 (321.0 - 407.0) [321 - 795] -> P86 (420.6 - 519.6) [408 - 930] -> P73 (777.0 - 870.0) [777 - 1158] -> P21 (882.0 - 972.0) [250 - 1117] -> P14 (993.8 - 1082.8) [668 - 1359]
+Nurse: 2 Route duration: 0 Covered demand: 0 Patient sequence: None
+Nurse: 3 Route duration: 0 Covered demand: 0 Patient sequence: None
+Nurse: 4 Route duration: 0 Covered demand: 0 Patient sequence: None
+Nurse: 5 Route duration: 155.4908287419184 Covered demand: 201 Patient sequence: P42 (53.0 - 169.0) [46 - 522] -> P50 (345.0 - 451.0) [345 - 1305] -> P8 (648.0 - 735.0) [648 - 1807] -> P24 (766.0 - 839.0) [766 - 1588] -> P69 (855.3 - 931.3) [628 - 1030] -> P88 (942.3 - 1042.3) [765 - 1769] -> P90 (1045.9 - 1133.9) [515 - 1491]
+Nurse: 6 Route duration: 0 Covered demand: 0 Patient sequence: None
+Nurse: 7 Route duration: 0 Covered demand: 0 Patient sequence: None
+Nurse: 8 Route duration: 0 Covered demand: 0 Patient sequence: None
+Nurse: 9 Route duration: 138.24904009211582 Covered demand: 205 Patient sequence: P16 (271.0 - 345.0) [271 - 522] -> P59 (377.2 - 490.2) [365 - 601] -> P35 (498.3 - 581.3) [223 - 1015] -> P55 (584.3 - 657.3) [279 - 663] -> P72 (675.8 - 774.8) [509 - 1342] -> P32 (785.9 - 874.9) [740 - 1841] -> P58 (877.8 - 973.8) [744 - 1035] -> P67 (976.6 - 1090.6) [725 - 1127]
+Nurse: 10 Route duration: 68.21260458513471 Covered demand: 144 Patient sequence: P40 (7.3 - 105.3) [4 - 527] -> P30 (148.0 - 251.0) [148 - 546] -> P75 (432.0 - 498.0) [432 - 743] -> P63 (644.0 - 707.0) [644 - 1621] -> P37 (796.0 - 876.0) [796 - 901]
+Nurse: 11 Route duration: 0 Covered demand: 0 Patient sequence: None
+Nurse: 12 Route duration: 0 Covered demand: 0 Patient sequence: None
+Nurse: 13 Route duration: 89.10952116586355 Covered demand: 180 Patient sequence: P85 (372.0 - 464.0) [372 - 669] -> P39 (474.4 - 553.4) [272 - 1124] -> P54 (639.0 - 754.0) [639 - 1319] -> P77 (758.5 - 836.5) [695 - 1762] -> P65 (840.6 - 918.6) [735 - 1583] -> P52 (924.9 - 1043.9) [620 - 1512] -> P22 (1050.6 - 1155.6) [704 - 1251]
+Nurse: 14 Route duration: 152.92322953760282 Covered demand: 192 Patient sequence: P51 (68.0 - 160.0) [68 - 379] -> P61 (203.0 - 278.0) [203 - 977] -> P78 (285.8 - 349.8) [181 - 352] -> P62 (369.5 - 461.5) [182 - 834] -> P56 (465.7 - 572.7) [410 - 1477] -> P33 (583.8 - 675.8) [188 - 1015] -> P7 (680.3 - 773.3) [633 - 786] -> P66 (789.6 - 876.6) [464 - 1504]
+Nurse: 15 Route duration: 0 Covered demand: 0 Patient sequence: None
+Nurse: 16 Route duration: 144.49587597163418 Covered demand: 202 Patient sequence: P29 (152.0 - 259.0) [152 - 324] -> P44 (262.0 - 355.0) [221 - 1379] -> P34 (370.0 - 435.0) [370 - 678] -> P45 (447.0 - 542.0) [306 - 1259] -> P19 (614.0 - 729.0) [614 - 764] -> P79 (743.3 - 859.3) [567 - 904] -> P81 (876.8 - 981.8) [643 - 1166]
+Nurse: 17 Route duration: 93.7971154208909 Covered demand: 158 Patient sequence: P60 (272.0 - 391.0) [272 - 573] -> P91 (393.0 - 468.0) [134 - 626] -> P28 (478.0 - 540.0) [478 - 712] -> P9 (660.0 - 776.0) [660 - 1542] -> P1 (783.1 - 865.1) [353 - 1119] -> P31 (873.1 - 986.1) [762 - 1792]
+Nurse: 18 Route duration: 154.9493659990057 Covered demand: 140 Patient sequence: P83 (53.3 - 159.3) [39 - 168] -> P49 (163.7 - 272.7) [39 - 353] -> P36 (285.8 - 356.8) [76 - 568] -> P82 (676.0 - 772.0) [676 - 1412] -> P80 (784.0 - 860.0) [372 - 946] -> P87 (868.2 - 949.2) [791 - 1523] -> P41 (973.4 - 1065.4) [488 - 1471] -> P11 (1087.3 - 1166.3) [647 - 1637]
+Nurse: 19 Route duration: 117.96378581482132 Covered demand: 202 Patient sequence: P23 (182.0 - 248.0) [182 - 538] -> P46 (258.0 - 359.0) [258 - 574] -> P84 (397.0 - 473.0) [71 - 572] -> P57 (512.0 - 611.0) [512 - 638] -> P68 (618.3 - 694.3) [530 - 982] -> P2 (702.8 - 794.8) [521 - 1264] -> P93 (806.8 - 904.8) [648 - 1742] -> P26 (913.8 - 982.8) [662 - 1127]
+Nurse: 20 Route duration: 132.70859462435806 Covered demand: 204 Patient sequence: P48 (61.0 - 140.0) [61 - 354] -> P3 (149.4 - 215.4) [60 - 1215] -> P15 (367.0 - 444.0) [367 - 720] -> P92 (465.8 - 576.8) [418 - 1187] -> P43 (621.0 - 700.0) [621 - 909] -> P25 (708.1 - 797.1) [178 - 863] -> P38 (806.3 - 903.3) [42 - 1194] -> P18 (906.1 - 1024.1) [572 - 1733] -> P71 (1063.2 - 1169.2) [757 - 1171]
+Nurse: 21 Route duration: 71.51624715886227 Covered demand: 191 Patient sequence: P20 (274.0 - 351.0) [274 - 374] -> P70 (354.0 - 452.0) [285 - 992] -> P74 (465.2 - 560.2) [340 - 713] -> P47 (567.2 - 660.2) [440 - 683] -> P13 (669.2 - 758.2) [153 - 1015] -> P76 (760.4 - 850.4) [460 - 912] -> P10 (872.0 - 980.0) [486 - 1406]
+Nurse: 22 Route duration: 113.16729120116129 Covered demand: 180 Patient sequence: P89 (26.7 - 90.7) [25 - 146] -> P64 (132.0 - 211.0) [132 - 440] -> P17 (529.0 - 593.0) [529 - 1194] -> P27 (598.4 - 699.4) [198 - 1298] -> P53 (776.0 - 891.0) [776 - 1326] -> P5 (892.4 - 979.4) [487 - 1161] -> P4 (992.5 - 1104.5) [682 - 1391]
+----------------------
+
+Total travel time: 1521.5688817806474
